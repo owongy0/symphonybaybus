@@ -83,6 +83,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
         }
         
         .est-tog {
@@ -94,6 +95,7 @@
             width: 100%;
             max-width: 500px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            position: relative;
         }
         
         .est-tog button {
@@ -248,25 +250,22 @@
             display: flex;
             align-items: center;
             gap: 5px;
-        }
-        
-        .top-ctl {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            padding: 0 15px;
-            margin-bottom: 15px;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            z-index: 100;
         }
         
         .lang-tog button {
-            padding: 5px 10px;
+            padding: 3px 6px;
             background-color: var(--tog-bg);
             color: var(--tog-txt);
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
+            font-size: 0.8rem;
         }
         
         .lang-tog button.active {
@@ -433,10 +432,8 @@
         .search-inp {
             flex: 1;
             min-width: 0;
-            margin-right: 10px;
+            width: 100%;
         }
-        
-        .clear-search { background-color: var(--acc); }
         
         .time-grid {
             display: grid;
@@ -557,7 +554,6 @@
         }
         
         @media (max-width: 768px) {
-            .top-ctl { flex-direction: column; align-items: center; gap: 10px; }
             .sched-head { flex-direction: column; align-items: flex-start; }
             .sched-title { margin-bottom: 10px; }
         }
@@ -566,19 +562,15 @@
             body { padding: 10px; }
             .next-bus-card { flex: 1 1 100%; }
             .time-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
-            .search-cont { flex-direction: column; gap: 10px; }
-            .search-inp { margin-right: 0; margin-bottom: 10px; }
             .time-cont { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="top-ctl">
-            <div class="lang-tog">
-                <button id="en-tog" class="active">English</button>
-                <button id="zh-tog">中文</button>
-            </div>
+        <div class="lang-tog">
+            <button id="en-tog" class="active">EN</button>
+            <button id="zh-tog">中</button>
         </div>
         
         <div class="est-tog">
@@ -700,7 +692,6 @@
                 
                 <div class="search-cont">
                     <input type="text" id="time-search-vr" class="search-inp" placeholder="Search time (e.g. 08:30)" data-placeholder-en="Search time (e.g. 08:30)" data-placeholder-zh="搜尋時間 (例如 08:30)">
-                    <button id="clear-vr" class="clear-search" data-en="Clear" data-zh="清除">Clear</button>
                 </div>
                 
                 <div class="time-grid" id="grid-vr"></div>
@@ -809,7 +800,6 @@
                 
                 <div class="search-cont">
                     <input type="text" id="time-search-vc" class="search-inp" placeholder="Search time (e.g. 08:30)" data-placeholder-en="Search time (e.g. 08:30)" data-placeholder-zh="搜尋時間 (例如 08:30)">
-                    <button id="clear-vc" class="clear-search" data-en="Clear" data-zh="清除">Clear</button>
                 </div>
                 
                 <div class="time-grid" id="grid-vc"></div>
@@ -861,9 +851,7 @@
             schedTitleVC: document.getElementById('sched-title-vc'),
             
             searchVR: document.getElementById('time-search-vr'),
-            clearVR: document.getElementById('clear-vr'),
             searchVC: document.getElementById('time-search-vc'),
-            clearVC: document.getElementById('clear-vc'),
             
             nextNTPVR: {
                 time: document.getElementById('next-ntp-vr'),
@@ -936,26 +924,39 @@
             holidayName: document.getElementById('holiday-name')
         };
 
-        const interRoutes = {
+        // Routes configuration - which routes stop at other estates
+        const routeConfig = {
+            // At Villa Rhapsody
             'vr': {
-                'vr-ntp': 'vc',
-                'vr-sc': 'vc'
+                'ntp-vr': false, // NTP to VR doesn't stop at VC
+                'vr-ntp': false, // VR to NTP doesn't stop at VC
+                'sc-vr': true,   // SC to VR does stop at VC
+                'vr-sc': true    // VR to SC stops at VC
             },
+            // At Villa Concerto
             'vc': {
-                'ntp-vc': 'vr',
-                'vc-ntp': 'vr',
-                'vc-sc': 'vr'
+                'ntp-vc': true,  // NTP to VC stops at VR
+                'vc-ntp': true,  // VC to NTP stops at VR
+                'sc-vc': false,  // SC to VC doesn't stop at VR
+                'vc-sc': false   // VC to SC doesn't stop at VR
             }
         };
-        
-        const specVia = {
+
+        // Special run via info
+        const specialVia = {
+            // At Villa Rhapsody
             'vr': {
-                'ntp-vr': 'sc',
-                'sc-vr': 'vc'
+                'ntp-vr': 'sc',  // Special runs from NTP to VR go via Sunshine City
+                'vr-ntp': 'sc',  // Special runs from VR to NTP go via Sunshine City
+                'sc-vr': 'vc',   // Special runs from SC to VR go via Villa Concerto
+                'vr-sc': 'vc'    // Special runs from VR to SC go via Villa Concerto
             },
+            // At Villa Concerto
             'vc': {
-                'ntp-vc': 'sc',
-                'sc-vc': 'ntp'
+                'ntp-vc': 'sc',  // Special runs from NTP to VC go via Sunshine City
+                'vc-ntp': 'sc',  // Special runs from VC to NTP go via Sunshine City
+                'sc-vc': 'ntp',  // Special runs from SC to VC go via New Town Plaza
+                'vc-sc': 'vr'    // Special runs from VC to SC go via Villa Rhapsody
             }
         };
 
@@ -1869,6 +1870,51 @@
             }
         };
 
+        const stopsText = {
+            "en": {
+                "vc": "Stops at Villa Concerto",
+                "vr": "Stops at Villa Rhapsody",
+                "sc": "Stops at Sunshine City",
+                "ntp": "Stops at New Town Plaza"
+            },
+            "zh": {
+                "vc": "途經凱弦居",
+                "vr": "途經凱琴居",
+                "sc": "途經新港城",
+                "ntp": "途經新城市廣場"
+            }
+        };
+
+        const viaText = {
+            "en": {
+                "sc": "Via Sunshine City",
+                "vc": "Via Villa Concerto",
+                "vr": "Via Villa Rhapsody",
+                "ntp": "Via New Town Plaza"
+            },
+            "zh": {
+                "sc": "途經新港城",
+                "vc": "途經凱弦居",
+                "vr": "途經凱琴居",
+                "ntp": "途經新城市廣場"
+            }
+        };
+
+        const dayTxt = {
+            "en": {
+                "weekday": "Weekday",
+                "saturday": "Saturday",
+                "sunday": "Sunday",
+                "holiday": "Public Holiday"
+            },
+            "zh": {
+                "weekday": "平日",
+                "saturday": "星期六",
+                "sunday": "星期日",
+                "holiday": "公眾假期"
+            }
+        };
+
         const holidays = [
             {date: "2025-01-01", name: "New Year's Day", nameZh: "新年"},
             {date: "2025-01-29", name: "Lunar New Year's Day", nameZh: "農曆新年"},
@@ -1888,65 +1934,6 @@
             {date: "2025-12-25", name: "Christmas", nameZh: "聖誕節"},
             {date: "2025-12-26", name: "Boxing Day", nameZh: "聖誕節翌日"}
         ];
-
-        const specDesc = {
-            "en": {
-                "ntp-vr": "Via Sunshine City",
-                "vr-ntp": "Via Sunshine City",
-                "sc-vr": "Via Villa Concerto", 
-                "vr-sc": "Via Villa Concerto"
-            },
-            "zh": {
-                "ntp-vr": "途經新港城",
-                "vr-ntp": "途經新港城",
-                "sc-vr": "經凱弦居", 
-                "vr-sc": "經凱弦居"
-            },
-            "vc": {
-                "en": {
-                    "ntp-vc": "Via Sunshine City",
-                    "vc-ntp": "Via Sunshine City",
-                    "sc-vc": "Via New Town Plaza", 
-                    "vc-sc": "Via New Town Plaza"
-                },
-                "zh": {
-                    "ntp-vc": "途經新港城",
-                    "vc-ntp": "途經新港城",
-                    "sc-vc": "經新城市廣場", 
-                    "vc-sc": "經新城市廣場"
-                }
-            }
-        };
-
-        const stopsTxt = {
-            "en": {
-                "vc": "Stops at Villa Concerto",
-                "vr": "Stops at Villa Rhapsody",
-                "sc": "Stops at Sunshine City",
-                "ntp": "Stops at New Town Plaza"
-            },
-            "zh": {
-                "vc": "途經凱弦居",
-                "vr": "途經凱琴居",
-                "sc": "途經新港城",
-                "ntp": "途經新城市廣場"
-            }
-        };
-
-        const dayTxt = {
-            "en": {
-                "weekday": "Weekday",
-                "saturday": "Saturday",
-                "sunday": "Sunday",
-                "holiday": "Public Holiday"
-            },
-            "zh": {
-                "weekday": "平日",
-                "saturday": "星期六",
-                "sunday": "星期日",
-                "holiday": "公眾假期"
-            }
-        };
 
         let s = {
             lang: 'en',
@@ -2046,23 +2033,11 @@
             render('vr');
         });
         
-        D.clearVR.addEventListener('click', () => {
-            s.searchVR = '';
-            D.searchVR.value = '';
-            render('vr');
-        });
-        
         D.routeSelVC.addEventListener('change', () => render('vc'));
         D.daySelVC.addEventListener('change', () => render('vc'));
         
         D.searchVC.addEventListener('input', (e) => {
             s.searchVC = e.target.value.trim();
-            render('vc');
-        });
-        
-        D.clearVC.addEventListener('click', () => {
-            s.searchVC = '';
-            D.searchVC.value = '';
             render('vc');
         });
         
@@ -2274,15 +2249,11 @@
             
             const prog = Math.min(100, Math.max(0, (elapsed / total) * 100));
             
-            let interVia = null;
-            if (interRoutes[estate] && interRoutes[estate][key]) {
-                interVia = interRoutes[estate][key];
-            }
+            // Check if route stops at the other estate
+            const stopsAt = routeConfig[estate] && routeConfig[estate][key];
             
-            let specVia = null;
-            if (next.special && specVia && specVia[estate] && specVia[estate][key]) {
-                specVia = specVia[estate][key];
-            }
+            // For special runs, check if they have an additional via location
+            const viaLocation = next.special && specialVia[estate] && specialVia[estate][key];
             
             return {
                 next,
@@ -2290,8 +2261,8 @@
                 until,
                 prog,
                 tmrw,
-                interVia,
-                specVia
+                stopsAt,
+                viaLocation
             };
         }
         
@@ -2312,39 +2283,61 @@
             const bus = getBus(key, estate);
             const next = bus.next;
             
+            // Set time display
             el.time.textContent = next.time;
             if (next.special) {
                 el.time.classList.add('special');
-                
-                const desc = estate === 'vr' 
-                    ? specDesc[s.lang][key]
-                    : specDesc.vc[s.lang][key];
-                
-                el.note.textContent = s.lang === 'en' 
-                    ? "Special Run - " + desc
-                    : "特別班次 - " + desc;
             } else {
                 el.time.classList.remove('special');
-                el.note.textContent = "";
             }
             
-            // Set stops information in the stops note element
-            if (bus.interVia) {
-                el.stops.textContent = stopsTxt[s.lang][bus.interVia];
-                el.stops.classList.remove('hidden');
+            // Handle special run notation & prevent redundancy
+            if (next.special && bus.viaLocation) {
+                // For special runs that go via another estate
+                const viaDesc = viaText[s.lang][bus.viaLocation];
+                el.note.textContent = s.lang === 'en' ? 
+                    "Special Run - " + viaDesc : 
+                    "特別班次 - " + viaDesc;
+                el.note.classList.remove('hidden');
+                
+                // If the bus already shows it goes via the other estate, don't show "stops at" 
+                // info to avoid redundancy like "Via Villa Concerto" and "Stops at Villa Concerto"
+                if (bus.stopsAt && bus.viaLocation !== (estate === 'vr' ? 'vc' : 'vr')) {
+                    const stopsDesc = stopsText[s.lang][estate === 'vr' ? 'vc' : 'vr'];
+                    el.stops.textContent = stopsDesc;
+                    el.stops.classList.remove('hidden');
+                } else {
+                    el.stops.classList.add('hidden');
+                }
+            } else if (next.special) {
+                // Special run without via info
+                el.note.textContent = s.lang === 'en' ? "Special Run" : "特別班次";
+                el.note.classList.remove('hidden');
+                
+                // Regular stops info for special runs without via location
+                if (bus.stopsAt) {
+                    const stopsDesc = stopsText[s.lang][estate === 'vr' ? 'vc' : 'vr'];
+                    el.stops.textContent = stopsDesc;
+                    el.stops.classList.remove('hidden');
+                } else {
+                    el.stops.classList.add('hidden');
+                }
             } else {
-                el.stops.textContent = "";
-                el.stops.classList.add('hidden');
+                // Regular run (not special)
+                el.note.textContent = "";
+                el.note.classList.add('hidden');
+                
+                // Show stops info for regular runs
+                if (bus.stopsAt) {
+                    const stopsDesc = stopsText[s.lang][estate === 'vr' ? 'vc' : 'vr'];
+                    el.stops.textContent = stopsDesc;
+                    el.stops.classList.remove('hidden');
+                } else {
+                    el.stops.classList.add('hidden');
+                }
             }
             
-            // Add special via info if available
-            if (next.special && key in specVia[estate]) {
-                const viaPlace = specVia[estate][key];
-                const stopMsg = stopsTxt[s.lang][viaPlace];
-                el.stops.textContent = stopMsg;
-                el.stops.classList.remove('hidden');
-            }
-            
+            // Set countdown text
             const cdText = bus.tmrw 
                 ? (s.lang === 'en' ? 
                    `Arriving tomorrow in ${fmtMins(bus.until)}` :
@@ -2354,11 +2347,12 @@
                    `到達時間剩餘 ${fmtMins(bus.until)}`);
             el.cdown.textContent = cdText;
             
+            // Set progress bar
             el.prog.style.width = bus.prog + '%';
             
             return {
                 bus: next,
-                interVia: bus.interVia
+                stopsAt: bus.stopsAt
             };
         }
         
@@ -2425,7 +2419,8 @@
                 nextTime = bus.next.time;
             }
             
-            const isInter = interRoutes[estate] && interRoutes[estate][key];
+            // Check if route stops at the other estate
+            const stopsAt = routeConfig[estate] && routeConfig[estate][key];
             
             const frag = document.createDocumentFragment();
             
@@ -2442,7 +2437,8 @@
                     cell.classList.add('next');
                 }
                 
-                if (isInter) {
+                // Mark cells that stop at the other estate
+                if (stopsAt) {
                     cell.classList.add('inter');
                 }
                 
@@ -2464,7 +2460,8 @@
             updateDateTime();
             updateBuses();
             
-            if (s.mode === 'schedule' && Math.random() < 0.1) {
+            // Always render the schedule when in schedule mode (removed the 10% probability)
+            if (s.mode === 'schedule') {
                 render(s.estate);
             }
             
