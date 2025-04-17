@@ -1,71 +1,76 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Villa Rhapsody Bus Schedule</title>
+    <title>Estate Shuttle Bus Schedule</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
         :root {
-            /* Light theme (default) */
-            --primary-color: #3498db;
-            --primary-light: rgba(52, 152, 219, 0.2);
-            --secondary-color: #2980b9;
-            --accent-color: #e74c3c;
-            --light-bg: #f5f7fa;
-            --text-color: #2c3e50;
-            --text-secondary: #7f8c8d;
-            --special-run-color: #e67e22;
-            --card-bg: white;
+            --pri: #3498db;
+            --pri-light: rgba(52, 152, 219, 0.2);
+            --sec: #2980b9;
+            --acc: #e74c3c;
+            --bg: #f5f7fa;
+            --txt: #2c3e50;
+            --txt-sec: #7f8c8d;
+            --special: #e67e22;
+            --card: white;
             --shadow: 0 2px 10px rgba(0,0,0,0.1);
-            --next-bus-border: 3px solid var(--primary-color);
+            --next-border: 3px solid var(--pri);
             --special-bg: #fef0e6;
-            --input-bg: white;
-            --input-border: #ddd;
-            --toggle-bg: #ecf0f1;
-            --toggle-text: #333;
-            --datetime-bg: rgba(52, 152, 219, 0.1);
-            --date-text: #2c3e50;
-            --time-text: #3498db;
-            --holiday-badge: #e74c3c;
+            --inp-bg: white;
+            --inp-brd: #ddd;
+            --tog-bg: #ecf0f1;
+            --tog-txt: #333;
+            --dt-bg: rgba(52, 152, 219, 0.1);
+            --date-txt: #2c3e50;
+            --time-txt: #3498db;
+            --holiday: #e74c3c;
+            --est-bg: #f5f7fa;
+            --est-act: #3498db;
+            --est-inact: #ecf0f1;
         }
         
-        /* Dark theme */
-        [data-theme="dark"] {
-            --primary-color: #2980b9;
-            --primary-light: rgba(41, 128, 185, 0.2);
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --light-bg: #1a1a1a;
-            --text-color: #ecf0f1;
-            --text-secondary: #bdc3c7;
-            --special-run-color: #e67e22;
-            --card-bg: #2c2c2c;
-            --shadow: 0 2px 10px rgba(0,0,0,0.3);
-            --next-bus-border: 3px solid var(--primary-color);
-            --special-bg: #4a3319;
-            --input-bg: #2c2c2c;
-            --input-border: #444;
-            --toggle-bg: #444;
-            --toggle-text: #ecf0f1;
-            --datetime-bg: rgba(41, 128, 185, 0.2);
-            --date-text: #ecf0f1;
-            --time-text: #3498db;
-            --holiday-badge: #e74c3c;
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --pri: #2980b9;
+                --pri-light: rgba(41, 128, 185, 0.2);
+                --sec: #3498db;
+                --acc: #e74c3c;
+                --bg: #1a1a1a;
+                --txt: #ecf0f1;
+                --txt-sec: #bdc3c7;
+                --special: #e67e22;
+                --card: #2c2c2c;
+                --shadow: 0 2px 10px rgba(0,0,0,0.3);
+                --next-border: 3px solid var(--pri);
+                --special-bg: #4a3319;
+                --inp-bg: #2c2c2c;
+                --inp-brd: #444;
+                --tog-bg: #444;
+                --tog-txt: #ecf0f1;
+                --dt-bg: rgba(41, 128, 185, 0.2);
+                --date-txt: #ecf0f1;
+                --time-txt: #3498db;
+                --holiday: #e74c3c;
+                --est-bg: #2c2c2c;
+                --est-act: #2980b9;
+                --est-inact: #444;
+            }
         }
         
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             transition: background-color 0.3s, color 0.3s;
         }
         
         body {
-            background-color: var(--light-bg);
-            color: var(--text-color);
+            background-color: var(--bg);
+            color: var(--txt);
             line-height: 1.6;
             padding: 15px;
             max-width: 1200px;
@@ -80,18 +85,39 @@
             align-items: center;
         }
         
-        .title-container {
-            margin-bottom: 15px;
+        .est-tog {
+            display: flex;
+            margin: 15px auto;
+            background-color: var(--est-bg);
+            border-radius: 10px;
+            padding: 5px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         
-        h1 {
-            color: var(--primary-color);
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 5px;
+        .est-tog button {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            background-color: transparent;
+            color: var(--txt);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
         }
         
-        .datetime-container {
+        .est-tog button.active {
+            background-color: var(--est-act);
+            color: white;
+        }
+        
+        .est-tog button:not(.active) {
+            background-color: var(--est-inact);
+        }
+        
+        .dt-cont {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -100,8 +126,8 @@
             max-width: 500px;
         }
         
-        .datetime-card {
-            background: var(--datetime-bg);
+        .dt-card {
+            background: var(--dt-bg);
             border-radius: 12px;
             padding: 10px 20px;
             display: flex;
@@ -115,13 +141,13 @@
         .date-display {
             font-size: 1rem;
             font-weight: 500;
-            color: var(--date-text);
+            color: var(--date-txt);
             margin-bottom: 4px;
             width: 100%;
             text-align: center;
         }
         
-        .time-display-container {
+        .time-cont {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -135,61 +161,56 @@
             align-items: center;
         }
         
-        .time-value {
+        .time-val {
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--time-text);
+            color: var(--time-txt);
             text-align: center;
             min-width: 40px;
             line-height: 1.2;
         }
         
-        .time-label {
+        .time-lab {
             font-size: 0.7rem;
-            color: var(--text-secondary);
+            color: var(--txt-sec);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
-        .time-separator {
+        .time-sep {
             font-size: 1.8rem;
-            color: var(--time-text);
+            color: var(--time-txt);
             opacity: 0.5;
             margin: 0 2px;
             line-height: 1.2;
         }
         
-        .day-type-container {
+        .day-cont {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 5px;
         }
         
-        .day-type-display {
+        .day-disp {
             display: inline-block;
             padding: 3px 12px;
             margin-top: 5px;
             border-radius: 15px;
             font-weight: 600;
-            background-color: var(--primary-color);
+            background-color: var(--pri);
             color: white;
             font-size: 0.9rem;
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
         
-        .day-type-display.weekend {
-            background-color: var(--accent-color);
-        }
-        
-        .day-type-display.holiday {
-            background-color: var(--special-run-color);
-        }
+        .day-disp.weekend { background-color: var(--acc); }
+        .day-disp.holiday { background-color: var(--special); }
         
         .holiday-name {
             font-size: 0.85rem;
-            color: var(--holiday-badge);
+            color: var(--holiday);
             font-weight: 600;
             margin-top: 3px;
         }
@@ -206,8 +227,8 @@
         
         .tab {
             padding: 10px 20px;
-            background-color: var(--toggle-bg);
-            color: var(--toggle-text);
+            background-color: var(--tog-bg);
+            color: var(--tog-txt);
             border: none;
             cursor: pointer;
             margin: 3px;
@@ -219,28 +240,28 @@
         }
         
         .tab.active {
-            background-color: var(--primary-color);
+            background-color: var(--pri);
             color: white;
         }
         
-        .language-toggle, .theme-toggle {
+        .lang-tog {
             display: flex;
             align-items: center;
             gap: 5px;
         }
         
-        .top-controls {
+        .top-ctl {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             width: 100%;
             padding: 0 15px;
             margin-bottom: 15px;
         }
         
-        .language-toggle button, .theme-toggle button {
+        .lang-tog button {
             padding: 5px 10px;
-            background-color: var(--toggle-bg);
-            color: var(--toggle-text);
+            background-color: var(--tog-bg);
+            color: var(--tog-txt);
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -248,8 +269,8 @@
             transition: all 0.3s;
         }
         
-        .language-toggle button.active, .theme-toggle button.active {
-            background-color: var(--primary-color);
+        .lang-tog button.active {
+            background-color: var(--pri);
             color: white;
         }
         
@@ -261,7 +282,7 @@
         }
         
         .next-bus-card {
-            background-color: var(--card-bg);
+            background-color: var(--card);
             border-radius: 12px;
             padding: 15px;
             box-shadow: var(--shadow);
@@ -271,72 +292,68 @@
         }
         
         .next-bus-card h3 {
-            color: var(--primary-color);
+            color: var(--pri);
             margin-bottom: 12px;
             font-size: 1.2rem;
-            border-bottom: 2px solid var(--light-bg);
+            border-bottom: 2px solid var(--bg);
             padding-bottom: 8px;
             font-weight: 600;
         }
         
-        .time-display {
+        .time-disp {
             font-size: 2.2rem;
             font-weight: 700;
-            color: var(--text-color);
+            color: var(--txt);
             margin: 12px 0;
             text-align: center;
         }
         
-        .time-display.special {
-            color: var(--special-run-color);
-        }
+        .time-disp.special { color: var(--special); }
         
-        .countdown {
+        .cdown {
             text-align: center;
             font-size: 1.1rem;
             margin-bottom: 10px;
             font-weight: 500;
-            color: var(--text-secondary);
+            color: var(--txt-sec);
         }
         
-        .countdown-bar-container {
+        .cdown-bar-cont {
             position: relative;
             height: 8px;
             width: 100%;
-            background-color: var(--light-bg);
+            background-color: var(--bg);
             border-radius: 4px;
             margin-bottom: 10px;
             overflow: hidden;
         }
         
-        .countdown-bar {
+        .cdown-bar {
             height: 100%;
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(to right, var(--pri), var(--sec));
             border-radius: 4px;
             width: 0%;
             transition: width 1s linear;
         }
         
-        .countdown-marker {
-            position: absolute;
-            top: 50%;
-            width: 3px;
-            height: 8px;
-            background-color: rgba(255, 255, 255, 0.7);
-            transform: translateY(-50%);
-        }
-        
-        .special-notice {
+        .spec-note {
             font-size: 0.9rem;
-            color: var(--special-run-color);
+            color: var(--special);
             margin-top: 8px;
             font-style: italic;
             text-align: center;
         }
         
+        .stops-note {
+            font-size: 0.9rem;
+            color: var(--txt-sec);
+            margin-top: 2px;
+            text-align: center;
+        }
+        
         .section-title {
             font-size: 1.3rem;
-            color: var(--primary-color);
+            color: var(--pri);
             margin: 20px 0 12px;
             text-align: center;
             font-weight: 700;
@@ -350,12 +367,12 @@
             content: "";
             height: 1px;
             flex-grow: 1;
-            background-color: var(--primary-light);
+            background-color: var(--pri-light);
             margin: 0 15px;
         }
         
-        .schedule-container {
-            background-color: var(--card-bg);
+        .sched-cont {
+            background-color: var(--card);
             border-radius: 12px;
             padding: 15px;
             box-shadow: var(--shadow);
@@ -363,7 +380,7 @@
             overflow-x: auto;
         }
         
-        .schedule-header {
+        .sched-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -372,9 +389,9 @@
             gap: 10px;
         }
         
-        .schedule-title {
+        .sched-title {
             font-size: 1.2rem;
-            color: var(--primary-color);
+            color: var(--pri);
             font-weight: 600;
         }
         
@@ -386,21 +403,18 @@
         
         select, button, input {
             padding: 8px 12px;
-            border: 1px solid var(--input-border);
+            border: 1px solid var(--inp-brd);
             border-radius: 8px;
-            background-color: var(--input-bg);
-            color: var(--text-color);
+            background-color: var(--inp-bg);
+            color: var(--txt);
             font-size: 0.9rem;
             font-weight: 500;
         }
         
-        input::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.8;
-        }
+        input::placeholder { color: var(--txt-sec); opacity: 0.8; }
         
         button {
-            background-color: var(--primary-color);
+            background-color: var(--pri);
             color: white;
             cursor: pointer;
             border: none;
@@ -408,29 +422,25 @@
             font-weight: 600;
         }
         
-        button:hover {
-            background-color: var(--secondary-color);
-        }
+        button:hover { background-color: var(--sec); }
         
-        .search-container {
+        .search-cont {
             display: flex;
             margin-bottom: 15px;
             width: 100%;
         }
         
-        .search-input {
+        .search-inp {
             flex: 1;
             min-width: 0;
             margin-right: 10px;
         }
         
-        .clear-search {
-            background-color: var(--accent-color);
-        }
+        .clear-search { background-color: var(--acc); }
         
         .time-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
             gap: 10px;
             margin-top: 15px;
         }
@@ -438,25 +448,32 @@
         .time-cell {
             padding: 10px 8px;
             text-align: center;
-            background-color: var(--light-bg);
+            background-color: var(--bg);
             border-radius: 8px;
             font-size: 0.95rem;
             font-weight: 500;
             transition: transform 0.2s;
+            position: relative;
         }
         
-        .time-cell:hover {
-            transform: translateY(-2px);
-        }
+        .time-cell:hover { transform: translateY(-2px); }
         
         .time-cell.special {
             background-color: var(--special-bg);
-            color: var(--special-run-color);
+            color: var(--special);
             font-weight: 600;
         }
         
-        .time-cell.highlight {
-            animation: pulse 1s infinite alternate;
+        .time-cell.highlight { animation: pulse 1s infinite alternate; }
+        
+        .time-cell.inter::after {
+            content: "•";
+            position: absolute;
+            top: 3px;
+            right: 5px;
+            color: var(--txt-sec);
+            font-size: 16px;
+            font-weight: bold;
         }
         
         @keyframes pulse {
@@ -464,15 +481,13 @@
             to { opacity: 0.6; }
         }
         
-        /* Fixed: Next bus now uses a border instead of changing the background */
         .time-cell.next {
-            border: var(--next-bus-border);
+            border: var(--next-border);
             position: relative;
             box-sizing: border-box;
         }
         
-        /* Add a dot indicator for next bus */
-        .time-cell.next::after {
+        .time-cell.next::before {
             content: "";
             position: absolute;
             top: 3px;
@@ -480,12 +495,10 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: var(--primary-color);
+            background-color: var(--pri);
         }
         
-        .hidden {
-            display: none;
-        }
+        .hidden { display: none; }
         
         .legend {
             display: flex;
@@ -508,18 +521,27 @@
             border-radius: 3px;
         }
         
-        .legend-color.regular {
-            background-color: var(--light-bg);
+        .legend-color.regular { background-color: var(--bg); }
+        .legend-color.special { background-color: var(--special-bg); }
+        
+        .legend-color.inter {
+            background-color: var(--bg);
+            position: relative;
         }
         
-        .legend-color.special {
-            background-color: var(--special-bg);
+        .legend-color.inter::after {
+            content: "•";
+            position: absolute;
+            top: -5px;
+            right: -1px;
+            color: var(--txt-sec);
+            font-size: 16px;
+            font-weight: bold;
         }
         
-        /* Update the next bus legend to match the new style */
         .legend-color.next {
-            background-color: var(--light-bg);
-            border: 2px solid var(--primary-color);
+            background-color: var(--bg);
+            border: 2px solid var(--pri);
             position: relative;
         }
         
@@ -531,103 +553,60 @@
             width: 5px;
             height: 5px;
             border-radius: 50%;
-            background-color: var(--primary-color);
+            background-color: var(--pri);
         }
         
         @media (max-width: 768px) {
-            .top-controls {
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-            
-            .theme-toggle {
-                order: -1;
-            }
-            
-            .title-container {
-                margin-top: 15px;
-            }
-            
-            .schedule-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .schedule-title {
-                margin-bottom: 10px;
-            }
+            .top-ctl { flex-direction: column; align-items: center; gap: 10px; }
+            .sched-head { flex-direction: column; align-items: flex-start; }
+            .sched-title { margin-bottom: 10px; }
         }
         
         @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            
-            .next-bus-card {
-                flex: 1 1 100%;
-            }
-            
-            .time-grid {
-                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-            }
-            
-            .search-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .search-input {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
-            
-            .time-display-container {
-                width: 100%;
-                justify-content: center;
-            }
+            body { padding: 10px; }
+            .next-bus-card { flex: 1 1 100%; }
+            .time-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+            .search-cont { flex-direction: column; gap: 10px; }
+            .search-inp { margin-right: 0; margin-bottom: 10px; }
+            .time-cont { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="top-controls">
-            <div class="language-toggle">
-                <button id="en-toggle" class="active">English</button>
-                <button id="zh-toggle">中文</button>
-            </div>
-            
-            <div class="theme-toggle">
-                <button id="light-toggle" class="active" data-en="Light" data-zh="淺色">Light</button>
-                <button id="dark-toggle" data-en="Dark" data-zh="深色">Dark</button>
+        <div class="top-ctl">
+            <div class="lang-tog">
+                <button id="en-tog" class="active">English</button>
+                <button id="zh-tog">中文</button>
             </div>
         </div>
         
-        <div class="title-container">
-            <h1 data-en="Villa Rhapsody Bus Schedule" data-zh="凱琴居巴士時間表">Villa Rhapsody Bus Schedule</h1>
+        <div class="est-tog">
+            <button id="vr-tog" class="active" data-en="Villa Rhapsody" data-zh="凱琴居">Villa Rhapsody</button>
+            <button id="vc-tog" data-en="Villa Concerto" data-zh="凱弦居">Villa Concerto</button>
         </div>
         
-        <div class="datetime-container">
-            <div class="datetime-card">
-                <div class="date-display" id="current-date"></div>
-                <div class="time-display-container" id="current-time">
+        <div class="dt-cont">
+            <div class="dt-card">
+                <div class="date-display" id="cur-date"></div>
+                <div class="time-cont" id="cur-time">
                     <div class="time-unit">
-                        <div class="time-value" id="hours">00</div>
-                        <div class="time-label" data-en="Hours" data-zh="時">Hours</div>
+                        <div class="time-val" id="hours">00</div>
+                        <div class="time-lab" data-en="Hours" data-zh="時">Hours</div>
                     </div>
-                    <div class="time-separator">:</div>
+                    <div class="time-sep">:</div>
                     <div class="time-unit">
-                        <div class="time-value" id="minutes">00</div>
-                        <div class="time-label" data-en="Minutes" data-zh="分">Minutes</div>
+                        <div class="time-val" id="minutes">00</div>
+                        <div class="time-lab" data-en="Minutes" data-zh="分">Minutes</div>
                     </div>
-                    <div class="time-separator">:</div>
+                    <div class="time-sep">:</div>
                     <div class="time-unit">
-                        <div class="time-value" id="seconds">00</div>
-                        <div class="time-label" data-en="Seconds" data-zh="秒">Seconds</div>
+                        <div class="time-val" id="seconds">00</div>
+                        <div class="time-lab" data-en="Seconds" data-zh="秒">Seconds</div>
                     </div>
                 </div>
-                <div class="day-type-container">
-                    <div class="day-type-display" id="day-type">Weekday</div>
+                <div class="day-cont">
+                    <div class="day-disp" id="day-type">Weekday</div>
                     <div class="holiday-name hidden" id="holiday-name"></div>
                 </div>
             </div>
@@ -635,168 +614,353 @@
     </header>
     
     <div class="tabs">
-        <button class="tab active" id="tab-current" data-en="Next Buses" data-zh="下一班車">Next Buses</button>
-        <button class="tab" id="tab-schedule" data-en="Full Schedule" data-zh="完整時間表">Full Schedule</button>
+        <button class="tab active" id="tab-cur" data-en="Next Buses" data-zh="下一班車">Next Buses</button>
+        <button class="tab" id="tab-sched" data-en="Full Schedule" data-zh="完整時間表">Full Schedule</button>
     </div>
     
-    <div id="current-view">
-        <div class="section-title" data-en="Main Route" data-zh="主線">Main Route</div>
-        <div class="next-buses">
-            <div class="next-bus-card">
-                <h3 data-en="From New Town Plaza to Villa Rhapsody" data-zh="由沙田新城市廣場往凱琴居">From New Town Plaza to Villa Rhapsody</h3>
-                <div class="time-display" id="next-ntp-to-vr">--:--</div>
-                <div class="countdown" id="countdown-ntp-to-vr">Loading...</div>
-                <div class="countdown-bar-container">
-                    <div class="countdown-bar" id="progress-ntp-to-vr"></div>
+    <!-- Villa Rhapsody View -->
+    <div id="vr-view">
+        <div id="cur-vr">
+            <div class="section-title" data-en="Main Route" data-zh="主線">Main Route</div>
+            <div class="next-buses">
+                <div class="next-bus-card">
+                    <h3>
+                        <span data-en="From New Town Plaza to Villa Rhapsody" data-zh="由新城市廣場往凱琴居">From New Town Plaza to Villa Rhapsody</span>
+                    </h3>
+                    <div class="time-disp" id="next-ntp-vr">--:--</div>
+                    <div class="cdown" id="cdown-ntp-vr">Loading...</div>
+                    <div class="cdown-bar-cont">
+                        <div class="cdown-bar" id="prog-ntp-vr"></div>
+                    </div>
+                    <div class="spec-note" id="spec-ntp-vr"></div>
+                    <div class="stops-note" id="stops-ntp-vr"></div>
                 </div>
-                <div class="special-notice" id="special-notice-ntp-to-vr"></div>
+                
+                <div class="next-bus-card">
+                    <h3>
+                        <span data-en="From Villa Rhapsody to New Town Plaza" data-zh="由凱琴居往新城市廣場">From Villa Rhapsody to New Town Plaza</span>
+                    </h3>
+                    <div class="time-disp" id="next-vr-ntp">--:--</div>
+                    <div class="cdown" id="cdown-vr-ntp">Loading...</div>
+                    <div class="cdown-bar-cont">
+                        <div class="cdown-bar" id="prog-vr-ntp"></div>
+                    </div>
+                    <div class="spec-note" id="spec-vr-ntp"></div>
+                    <div class="stops-note" id="stops-vr-ntp"></div>
+                </div>
             </div>
             
-            <div class="next-bus-card">
-                <h3 data-en="From Villa Rhapsody to New Town Plaza" data-zh="由凱琴居往沙田新城市廣場">From Villa Rhapsody to New Town Plaza</h3>
-                <div class="time-display" id="next-vr-to-ntp">--:--</div>
-                <div class="countdown" id="countdown-vr-to-ntp">Loading...</div>
-                <div class="countdown-bar-container">
-                    <div class="countdown-bar" id="progress-vr-to-ntp"></div>
+            <div class="section-title" data-en="Short Route" data-zh="短途線">Short Route</div>
+            <div class="next-buses">
+                <div class="next-bus-card">
+                    <h3>
+                        <span data-en="From Sunshine City to Villa Rhapsody" data-zh="由新港城往凱琴居">From Sunshine City to Villa Rhapsody</span>
+                    </h3>
+                    <div class="time-disp" id="next-sc-vr">--:--</div>
+                    <div class="cdown" id="cdown-sc-vr">Loading...</div>
+                    <div class="cdown-bar-cont">
+                        <div class="cdown-bar" id="prog-sc-vr"></div>
+                    </div>
+                    <div class="spec-note" id="spec-sc-vr"></div>
+                    <div class="stops-note" id="stops-sc-vr"></div>
                 </div>
-                <div class="special-notice" id="special-notice-vr-to-ntp"></div>
+                
+                <div class="next-bus-card">
+                    <h3>
+                        <span data-en="From Villa Rhapsody to Sunshine City" data-zh="由凱琴居往新港城">From Villa Rhapsody to Sunshine City</span>
+                    </h3>
+                    <div class="time-disp" id="next-vr-sc">--:--</div>
+                    <div class="cdown" id="cdown-vr-sc">Loading...</div>
+                    <div class="cdown-bar-cont">
+                        <div class="cdown-bar" id="prog-vr-sc"></div>
+                    </div>
+                    <div class="spec-note" id="spec-vr-sc"></div>
+                    <div class="stops-note" id="stops-vr-sc"></div>
+                </div>
             </div>
         </div>
         
-        <div class="section-title" data-en="Short Route" data-zh="短途線">Short Route</div>
-        <div class="next-buses">
-            <div class="next-bus-card">
-                <h3 data-en="From Sunshine City to Villa Rhapsody" data-zh="由馬鞍山新港城往凱琴居">From Sunshine City to Villa Rhapsody</h3>
-                <div class="time-display" id="next-sc-to-vr">--:--</div>
-                <div class="countdown" id="countdown-sc-to-vr">Loading...</div>
-                <div class="countdown-bar-container">
-                    <div class="countdown-bar" id="progress-sc-to-vr"></div>
+        <div id="sched-vr" class="hidden">
+            <div class="sched-cont">
+                <div class="sched-head">
+                    <div class="sched-title" id="sched-title-vr">Bus Schedule</div>
+                    <div class="controls">
+                        <select id="route-sel-vr">
+                            <option value="ntp-vr" data-en="New Town Plaza to Villa Rhapsody (Main)" data-zh="由新城市廣場往凱琴居 (主線)">New Town Plaza to Villa Rhapsody (Main)</option>
+                            <option value="vr-ntp" data-en="Villa Rhapsody to New Town Plaza (Main)" data-zh="由凱琴居往新城市廣場 (主線)">Villa Rhapsody to New Town Plaza (Main)</option>
+                            <option value="sc-vr" data-en="Sunshine City to Villa Rhapsody (Short)" data-zh="由新港城往凱琴居 (短途線)">Sunshine City to Villa Rhapsody (Short)</option>
+                            <option value="vr-sc" data-en="Villa Rhapsody to Sunshine City (Short)" data-zh="由凱琴居往新港城 (短途線)">Villa Rhapsody to Sunshine City (Short)</option>
+                        </select>
+                        <select id="day-sel-vr">
+                            <option value="weekday" data-en="Monday to Friday" data-zh="星期一至星期五">Monday to Friday</option>
+                            <option value="weekend" data-en="Saturday, Sunday & Holiday" data-zh="星期六/日及公眾假期">Saturday, Sunday & Holiday</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="special-notice" id="special-notice-sc-to-vr"></div>
-            </div>
-            
-            <div class="next-bus-card">
-                <h3 data-en="From Villa Rhapsody to Sunshine City" data-zh="由凱琴居往馬鞍山新港城">From Villa Rhapsody to Sunshine City</h3>
-                <div class="time-display" id="next-vr-to-sc">--:--</div>
-                <div class="countdown" id="countdown-vr-to-sc">Loading...</div>
-                <div class="countdown-bar-container">
-                    <div class="countdown-bar" id="progress-vr-to-sc"></div>
+                
+                <div class="search-cont">
+                    <input type="text" id="time-search-vr" class="search-inp" placeholder="Search time (e.g. 08:30)" data-placeholder-en="Search time (e.g. 08:30)" data-placeholder-zh="搜尋時間 (例如 08:30)">
+                    <button id="clear-vr" class="clear-search" data-en="Clear" data-zh="清除">Clear</button>
                 </div>
-                <div class="special-notice" id="special-notice-vr-to-sc"></div>
+                
+                <div class="time-grid" id="grid-vr"></div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color regular"></div>
+                        <span data-en="Regular Service" data-zh="正常班次">Regular Service</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color special"></div>
+                        <span data-en="Special Run" data-zh="特別班次">Special Run</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color next"></div>
+                        <span data-en="Next Bus" data-zh="下一班車">Next Bus</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color inter"></div>
+                        <span data-en="Stops at Villa Concerto" data-zh="途經凱弦居">Stops at Villa Concerto</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
-    <div id="schedule-view" class="hidden">
-        <div class="schedule-container">
-            <div class="schedule-header">
-                <div class="schedule-title" id="schedule-title">Bus Schedule</div>
-                <div class="controls">
-                    <select id="route-select">
-                        <option value="ntp-to-vr" data-en="New Town Plaza to Villa Rhapsody (Main Route)" data-zh="由沙田新城市廣場往凱琴居 (主線)">New Town Plaza to Villa Rhapsody (Main Route)</option>
-                        <option value="vr-to-ntp" data-en="Villa Rhapsody to New Town Plaza (Main Route)" data-zh="由凱琴居往沙田新城市廣場 (主線)">Villa Rhapsody to New Town Plaza (Main Route)</option>
-                        <option value="sc-to-vr" data-en="Sunshine City to Villa Rhapsody (Short Route)" data-zh="由馬鞍山新港城往凱琴居 (短途線)">Sunshine City to Villa Rhapsody (Short Route)</option>
-                        <option value="vr-to-sc" data-en="Villa Rhapsody to Sunshine City (Short Route)" data-zh="由凱琴居往馬鞍山新港城 (短途線)">Villa Rhapsody to Sunshine City (Short Route)</option>
-                    </select>
-                    <select id="day-select">
-                        <option value="weekday" data-en="Monday to Friday" data-zh="星期一至星期五">Monday to Friday</option>
-                        <option value="weekend" data-en="Saturday, Sunday & Public Holiday" data-zh="星期六/日及公眾假期">Saturday, Sunday & Public Holiday</option>
-                    </select>
+    <!-- Villa Concerto View -->
+    <div id="vc-view" class="hidden">
+        <div id="cur-vc">
+            <div class="section-title" data-en="Main Route" data-zh="主線">Main Route</div>
+            <div class="next-buses">
+                <div class="next-bus-card">
+                    <h3>
+                        <span data-en="From New Town Plaza to Villa Concerto" data-zh="由新城市廣場往凱弦居">From New Town Plaza to Villa Concerto</span>
+                    </h3>
+                    <div class="time-disp" id="next-ntp-vc">--:--</div>
+                    <div class="cdown" id="cdown-ntp-vc">Loading...</div>
+                    <div class="cdown-bar-cont">
+                        <div class="cdown-bar" id="prog-ntp-vc"></div>
+                    </div>
+                    <div class="spec-note" id="spec-ntp-vc"></div>
+                    <div class="stops-note" id="stops-ntp-vc"></div>
+                </div>
+                
+                <div class="next-bus-card">
+                    <h3>
+                        <span data-en="From Villa Concerto to New Town Plaza" data-zh="由凱弦居往新城市廣場">From Villa Concerto to New Town Plaza</span>
+                    </h3>
+                    <div class="time-disp" id="next-vc-ntp">--:--</div>
+                    <div class="cdown" id="cdown-vc-ntp">Loading...</div>
+                    <div class="cdown-bar-cont">
+                        <div class="cdown-bar" id="prog-vc-ntp"></div>
+                    </div>
+                    <div class="spec-note" id="spec-vc-ntp"></div>
+                    <div class="stops-note" id="stops-vc-ntp"></div>
                 </div>
             </div>
             
-            <div class="search-container">
-                <input type="text" id="time-search" class="search-input" placeholder="Search time (e.g. 08:30)" data-placeholder-en="Search time (e.g. 08:30)" data-placeholder-zh="搜尋時間 (例如 08:30)">
-                <button id="clear-search" class="clear-search" data-en="Clear" data-zh="清除">Clear</button>
-            </div>
-            
-            <div class="time-grid" id="time-grid">
-                <!-- Times will be filled in by JavaScript -->
-            </div>
-            
-            <div class="legend">
-                <div class="legend-item">
-                    <div class="legend-color regular"></div>
-                    <span data-en="Regular Service" data-zh="正常班次">Regular Service</span>
+            <div class="section-title" data-en="Short Route" data-zh="短途線">Short Route</div>
+            <div class="next-buses">
+                <div class="next-bus-card">
+                    <h3>
+                        <span data-en="From Sunshine City to Villa Concerto" data-zh="由新港城往凱弦居">From Sunshine City to Villa Concerto</span>
+                    </h3>
+                    <div class="time-disp" id="next-sc-vc">--:--</div>
+                    <div class="cdown" id="cdown-sc-vc">Loading...</div>
+                    <div class="cdown-bar-cont">
+                        <div class="cdown-bar" id="prog-sc-vc"></div>
+                    </div>
+                    <div class="spec-note" id="spec-sc-vc"></div>
+                    <div class="stops-note" id="stops-sc-vc"></div>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color special"></div>
-                    <span data-en="Special Run" data-zh="特別班次">Special Run</span>
+                
+                <div class="next-bus-card">
+                    <h3>
+                        <span data-en="From Villa Concerto to Sunshine City" data-zh="由凱弦居往新港城">From Villa Concerto to Sunshine City</span>
+                    </h3>
+                    <div class="time-disp" id="next-vc-sc">--:--</div>
+                    <div class="cdown" id="cdown-vc-sc">Loading...</div>
+                    <div class="cdown-bar-cont">
+                        <div class="cdown-bar" id="prog-vc-sc"></div>
+                    </div>
+                    <div class="spec-note" id="spec-vc-sc"></div>
+                    <div class="stops-note" id="stops-vc-sc"></div>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color next"></div>
-                    <span data-en="Next Bus" data-zh="下一班車">Next Bus</span>
+            </div>
+        </div>
+        
+        <div id="sched-vc" class="hidden">
+            <div class="sched-cont">
+                <div class="sched-head">
+                    <div class="sched-title" id="sched-title-vc">Bus Schedule</div>
+                    <div class="controls">
+                        <select id="route-sel-vc">
+                            <option value="ntp-vc" data-en="New Town Plaza to Villa Concerto (Main)" data-zh="由新城市廣場往凱弦居 (主線)">New Town Plaza to Villa Concerto (Main)</option>
+                            <option value="vc-ntp" data-en="Villa Concerto to New Town Plaza (Main)" data-zh="由凱弦居往新城市廣場 (主線)">Villa Concerto to New Town Plaza (Main)</option>
+                            <option value="sc-vc" data-en="Sunshine City to Villa Concerto (Short)" data-zh="由新港城往凱弦居 (短途線)">Sunshine City to Villa Concerto (Short)</option>
+                            <option value="vc-sc" data-en="Villa Concerto to Sunshine City (Short)" data-zh="由凱弦居往新港城 (短途線)">Villa Concerto to Sunshine City (Short)</option>
+                        </select>
+                        <select id="day-sel-vc">
+                            <option value="weekday" data-en="Monday to Friday" data-zh="星期一至星期五">Monday to Friday</option>
+                            <option value="weekend" data-en="Saturday, Sunday & Holiday" data-zh="星期六/日及公眾假期">Saturday, Sunday & Holiday</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="search-cont">
+                    <input type="text" id="time-search-vc" class="search-inp" placeholder="Search time (e.g. 08:30)" data-placeholder-en="Search time (e.g. 08:30)" data-placeholder-zh="搜尋時間 (例如 08:30)">
+                    <button id="clear-vc" class="clear-search" data-en="Clear" data-zh="清除">Clear</button>
+                </div>
+                
+                <div class="time-grid" id="grid-vc"></div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color regular"></div>
+                        <span data-en="Regular Service" data-zh="正常班次">Regular Service</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color special"></div>
+                        <span data-en="Special Run" data-zh="特別班次">Special Run</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color next"></div>
+                        <span data-en="Next Bus" data-zh="下一班車">Next Bus</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color inter"></div>
+                        <span data-en="Stops at Villa Rhapsody" data-zh="途經凱琴居">Stops at Villa Rhapsody</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Performance optimization: Store DOM references outside functions
-        const DOM = {
-            // Tabs and view elements
-            tabCurrent: document.getElementById('tab-current'),
-            tabSchedule: document.getElementById('tab-schedule'),
-            currentView: document.getElementById('current-view'),
-            scheduleView: document.getElementById('schedule-view'),
+        const D = {
+            vrTog: document.getElementById('vr-tog'),
+            vcTog: document.getElementById('vc-tog'),
+            vrView: document.getElementById('vr-view'),
+            vcView: document.getElementById('vc-view'),
             
-            // Route and day controls
-            routeSelect: document.getElementById('route-select'),
-            daySelect: document.getElementById('day-select'),
-            timeGrid: document.getElementById('time-grid'),
-            scheduleTitle: document.getElementById('schedule-title'),
+            tabCur: document.getElementById('tab-cur'),
+            tabSched: document.getElementById('tab-sched'),
+            curVR: document.getElementById('cur-vr'),
+            schedVR: document.getElementById('sched-vr'),
+            curVC: document.getElementById('cur-vc'),
+            schedVC: document.getElementById('sched-vc'),
             
-            // Search elements
-            timeSearch: document.getElementById('time-search'),
-            clearSearch: document.getElementById('clear-search'),
+            routeSelVR: document.getElementById('route-sel-vr'),
+            daySelVR: document.getElementById('day-sel-vr'),
+            gridVR: document.getElementById('grid-vr'),
+            schedTitleVR: document.getElementById('sched-title-vr'),
             
-            // Next bus elements - Main Route
-            nextNTPtoVR: {
-                time: document.getElementById('next-ntp-to-vr'),
-                countdown: document.getElementById('countdown-ntp-to-vr'),
-                progress: document.getElementById('progress-ntp-to-vr'),
-                notice: document.getElementById('special-notice-ntp-to-vr')
+            routeSelVC: document.getElementById('route-sel-vc'),
+            daySelVC: document.getElementById('day-sel-vc'),
+            gridVC: document.getElementById('grid-vc'),
+            schedTitleVC: document.getElementById('sched-title-vc'),
+            
+            searchVR: document.getElementById('time-search-vr'),
+            clearVR: document.getElementById('clear-vr'),
+            searchVC: document.getElementById('time-search-vc'),
+            clearVC: document.getElementById('clear-vc'),
+            
+            nextNTPVR: {
+                time: document.getElementById('next-ntp-vr'),
+                cdown: document.getElementById('cdown-ntp-vr'),
+                prog: document.getElementById('prog-ntp-vr'),
+                note: document.getElementById('spec-ntp-vr'),
+                stops: document.getElementById('stops-ntp-vr')
             },
-            nextVRtoNTP: {
-                time: document.getElementById('next-vr-to-ntp'),
-                countdown: document.getElementById('countdown-vr-to-ntp'),
-                progress: document.getElementById('progress-vr-to-ntp'),
-                notice: document.getElementById('special-notice-vr-to-ntp')
-            },
-            
-            // Next bus elements - Short Route
-            nextSCtoVR: {
-                time: document.getElementById('next-sc-to-vr'),
-                countdown: document.getElementById('countdown-sc-to-vr'),
-                progress: document.getElementById('progress-sc-to-vr'),
-                notice: document.getElementById('special-notice-sc-to-vr')
-            },
-            nextVRtoSC: {
-                time: document.getElementById('next-vr-to-sc'),
-                countdown: document.getElementById('countdown-vr-to-sc'),
-                progress: document.getElementById('progress-vr-to-sc'),
-                notice: document.getElementById('special-notice-vr-to-sc')
+            nextVRNTP: {
+                time: document.getElementById('next-vr-ntp'),
+                cdown: document.getElementById('cdown-vr-ntp'),
+                prog: document.getElementById('prog-vr-ntp'),
+                note: document.getElementById('spec-vr-ntp'),
+                stops: document.getElementById('stops-vr-ntp')
             },
             
-            // Theme and language toggles
-            enToggle: document.getElementById('en-toggle'),
-            zhToggle: document.getElementById('zh-toggle'),
-            lightToggle: document.getElementById('light-toggle'),
-            darkToggle: document.getElementById('dark-toggle'),
+            nextSCVR: {
+                time: document.getElementById('next-sc-vr'),
+                cdown: document.getElementById('cdown-sc-vr'),
+                prog: document.getElementById('prog-sc-vr'),
+                note: document.getElementById('spec-sc-vr'),
+                stops: document.getElementById('stops-sc-vr')
+            },
+            nextVRSC: {
+                time: document.getElementById('next-vr-sc'),
+                cdown: document.getElementById('cdown-vr-sc'),
+                prog: document.getElementById('prog-vr-sc'),
+                note: document.getElementById('spec-vr-sc'),
+                stops: document.getElementById('stops-vr-sc')
+            },
             
-            // Date and time display
-            currentDate: document.getElementById('current-date'),
-            hoursEl: document.getElementById('hours'),
-            minutesEl: document.getElementById('minutes'),
-            secondsEl: document.getElementById('seconds'),
+            nextNTPVC: {
+                time: document.getElementById('next-ntp-vc'),
+                cdown: document.getElementById('cdown-ntp-vc'),
+                prog: document.getElementById('prog-ntp-vc'),
+                note: document.getElementById('spec-ntp-vc'),
+                stops: document.getElementById('stops-ntp-vc')
+            },
+            nextVCNTP: {
+                time: document.getElementById('next-vc-ntp'),
+                cdown: document.getElementById('cdown-vc-ntp'),
+                prog: document.getElementById('prog-vc-ntp'),
+                note: document.getElementById('spec-vc-ntp'),
+                stops: document.getElementById('stops-vc-ntp')
+            },
+            
+            nextSCVC: {
+                time: document.getElementById('next-sc-vc'),
+                cdown: document.getElementById('cdown-sc-vc'),
+                prog: document.getElementById('prog-sc-vc'),
+                note: document.getElementById('spec-sc-vc'),
+                stops: document.getElementById('stops-sc-vc')
+            },
+            nextVCSC: {
+                time: document.getElementById('next-vc-sc'),
+                cdown: document.getElementById('cdown-vc-sc'),
+                prog: document.getElementById('prog-vc-sc'),
+                note: document.getElementById('spec-vc-sc'),
+                stops: document.getElementById('stops-vc-sc')
+            },
+            
+            enTog: document.getElementById('en-tog'),
+            zhTog: document.getElementById('zh-tog'),
+            
+            curDate: document.getElementById('cur-date'),
+            hours: document.getElementById('hours'),
+            minutes: document.getElementById('minutes'),
+            seconds: document.getElementById('seconds'),
             dayType: document.getElementById('day-type'),
             holidayName: document.getElementById('holiday-name')
         };
 
-        // Bus schedule data
-        const busSchedules = {
-            // MAIN ROUTE
-            "ntp-to-vr": { // New Town Plaza to Villa Rhapsody
+        const interRoutes = {
+            'vr': {
+                'vr-ntp': 'vc',
+                'vr-sc': 'vc'
+            },
+            'vc': {
+                'ntp-vc': 'vr',
+                'vc-ntp': 'vr',
+                'vc-sc': 'vr'
+            }
+        };
+        
+        const specVia = {
+            'vr': {
+                'ntp-vr': 'sc',
+                'sc-vr': 'vc'
+            },
+            'vc': {
+                'ntp-vc': 'sc',
+                'sc-vc': 'ntp'
+            }
+        };
+
+        const schVR = {
+            "ntp-vr": {
                 "weekday": [
                     {time: "06:35", special: false},
                     {time: "06:50", special: false},
@@ -912,7 +1076,7 @@
                     {time: "23:00", special: true}
                 ]
             },
-            "vr-to-ntp": { // Villa Rhapsody to New Town Plaza
+            "vr-ntp": {
                 "weekday": [
                     {time: "06:16", special: true},
                     {time: "06:31", special: true},
@@ -1028,9 +1192,7 @@
                     {time: "22:41", special: true}
                 ]
             },
-            
-            // SHORT ROUTE
-            "sc-to-vr": { // Sunshine City to Villa Rhapsody
+            "sc-vr": {
                 "weekday": [
                     {time: "07:10", special: false},
                     {time: "07:22", special: false},
@@ -1139,11 +1301,11 @@
                     {time: "23:15", special: true}
                 ]
             },
-            "vr-to-sc": { // Villa Rhapsody to Sunshine City
+            "vr-sc": {
                 "weekday": [
-                    {time: "06:16", special: true},
-                    {time: "06:31", special: true},
-                    {time: "06:41", special: true},
+                    {time: "06:15", special: true},
+                    {time: "06:30", special: true},
+                    {time: "06:40", special: true},
                     {time: "07:00", special: false},
                     {time: "07:15", special: false},
                     {time: "07:20", special: false},
@@ -1171,10 +1333,10 @@
                     {time: "13:00", special: false},
                     {time: "13:20", special: false},
                     {time: "13:40", special: false},
-                    {time: "14:01", special: true},
+                    {time: "14:00", special: true},
                     {time: "14:20", special: false},
                     {time: "14:40", special: false},
-                    {time: "15:01", special: true},
+                    {time: "15:00", special: true},
                     {time: "15:20", special: false},
                     {time: "15:40", special: false},
                     {time: "16:00", special: false},
@@ -1190,17 +1352,17 @@
                     {time: "19:20", special: false},
                     {time: "19:40", special: false},
                     {time: "20:00", special: false},
-                    {time: "20:21", special: true},
-                    {time: "20:41", special: true},
-                    {time: "21:01", special: true},
-                    {time: "21:21", special: true},
-                    {time: "21:41", special: true},
-                    {time: "22:11", special: true},
-                    {time: "22:41", special: true}
+                    {time: "20:20", special: true},
+                    {time: "20:40", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:10", special: true},
+                    {time: "22:40", special: true}
                 ],
                 "weekend": [
-                    {time: "06:16", special: true},
-                    {time: "06:36", special: true},
+                    {time: "06:15", special: true},
+                    {time: "06:35", special: true},
                     {time: "07:00", special: false},
                     {time: "07:20", special: false},
                     {time: "07:40", special: false},
@@ -1242,19 +1404,472 @@
                     {time: "19:40", special: false},
                     {time: "20:00", special: false},
                     {time: "20:20", special: false},
-                    {time: "20:41", special: true},
-                    {time: "21:01", special: true},
-                    {time: "21:21", special: true},
-                    {time: "21:41", special: true},
-                    {time: "22:11", special: true},
-                    {time: "22:41", special: true}
+                    {time: "20:40", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:10", special: true},
+                    {time: "22:40", special: true}
+                ]
+            }
+        };
+        
+        const schVC = {
+            "ntp-vc": {
+                "weekday": [
+                    {time: "06:35", special: false},
+                    {time: "06:50", special: false},
+                    {time: "07:00", special: false},
+                    {time: "07:15", special: false},
+                    {time: "07:25", special: false},
+                    {time: "07:35", special: false},
+                    {time: "07:50", special: false},
+                    {time: "08:00", special: false},
+                    {time: "08:10", special: false},
+                    {time: "08:25", special: false},
+                    {time: "08:35", special: false},
+                    {time: "08:45", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:15", special: false},
+                    {time: "09:35", special: false},
+                    {time: "09:55", special: false},
+                    {time: "10:15", special: false},
+                    {time: "10:35", special: false},
+                    {time: "10:55", special: false},
+                    {time: "11:15", special: false},
+                    {time: "11:35", special: false},
+                    {time: "11:55", special: false},
+                    {time: "12:15", special: false},
+                    {time: "12:35", special: false},
+                    {time: "12:55", special: false},
+                    {time: "13:15", special: false},
+                    {time: "13:45", special: true},
+                    {time: "14:20", special: false},
+                    {time: "14:45", special: true},
+                    {time: "15:20", special: false},
+                    {time: "15:35", special: false},
+                    {time: "15:55", special: false},
+                    {time: "16:15", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:45", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:15", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:45", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:15", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:45", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:15", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:45", special: false},
+                    {time: "20:00", special: true},
+                    {time: "20:15", special: true},
+                    {time: "20:40", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:00", special: true},
+                    {time: "22:30", special: true},
+                    {time: "23:00", special: true}
+                ],
+                "weekend": [
+                    {time: "06:35", special: false},
+                    {time: "06:55", special: false},
+                    {time: "07:15", special: false},
+                    {time: "07:35", special: false},
+                    {time: "07:55", special: false},
+                    {time: "08:15", special: false},
+                    {time: "08:30", special: false},
+                    {time: "08:45", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:15", special: false},
+                    {time: "09:35", special: false},
+                    {time: "09:55", special: false},
+                    {time: "10:15", special: false},
+                    {time: "10:35", special: false},
+                    {time: "10:55", special: false},
+                    {time: "11:15", special: false},
+                    {time: "11:35", special: false},
+                    {time: "11:55", special: false},
+                    {time: "12:15", special: false},
+                    {time: "12:35", special: false},
+                    {time: "12:55", special: false},
+                    {time: "13:15", special: false},
+                    {time: "13:35", special: false},
+                    {time: "13:55", special: false},
+                    {time: "14:15", special: false},
+                    {time: "14:35", special: false},
+                    {time: "14:55", special: false},
+                    {time: "15:15", special: false},
+                    {time: "15:35", special: false},
+                    {time: "15:55", special: false},
+                    {time: "16:15", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:45", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:15", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:45", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:15", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:45", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:15", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:45", special: false},
+                    {time: "20:00", special: false},
+                    {time: "20:15", special: false},
+                    {time: "20:35", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:00", special: true},
+                    {time: "22:30", special: true},
+                    {time: "23:00", special: true}
+                ]
+            },
+            "vc-ntp": {
+                "weekday": [
+                    {time: "06:15", special: true},
+                    {time: "06:30", special: true},
+                    {time: "06:40", special: true},
+                    {time: "07:00", special: false},
+                    {time: "07:10", special: false},
+                    {time: "07:20", special: false},
+                    {time: "07:35", special: false},
+                    {time: "07:45", special: false},
+                    {time: "07:55", special: false},
+                    {time: "08:10", special: false},
+                    {time: "08:20", special: false},
+                    {time: "08:30", special: false},
+                    {time: "08:45", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:20", special: false},
+                    {time: "09:40", special: false},
+                    {time: "10:00", special: false},
+                    {time: "10:20", special: false},
+                    {time: "10:40", special: false},
+                    {time: "11:00", special: false},
+                    {time: "11:20", special: false},
+                    {time: "11:40", special: false},
+                    {time: "12:00", special: false},
+                    {time: "12:20", special: false},
+                    {time: "12:40", special: false},
+                    {time: "13:00", special: false},
+                    {time: "13:30", special: false},
+                    {time: "14:00", special: true},
+                    {time: "14:30", special: false},
+                    {time: "15:00", special: true},
+                    {time: "15:20", special: false},
+                    {time: "15:40", special: false},
+                    {time: "16:00", special: false},
+                    {time: "16:15", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:45", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:15", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:45", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:15", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:45", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:15", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:45", special: false},
+                    {time: "20:00", special: false},
+                    {time: "20:20", special: true},
+                    {time: "20:40", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:10", special: true},
+                    {time: "22:40", special: true}
+                ],
+                "weekend": [
+                    {time: "06:15", special: true},
+                    {time: "06:35", special: true},
+                    {time: "07:00", special: false},
+                    {time: "07:20", special: false},
+                    {time: "07:40", special: false},
+                    {time: "08:00", special: false},
+                    {time: "08:15", special: false},
+                    {time: "08:30", special: false},
+                    {time: "08:45", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:20", special: false},
+                    {time: "09:40", special: false},
+                    {time: "10:00", special: false},
+                    {time: "10:20", special: false},
+                    {time: "10:40", special: false},
+                    {time: "11:00", special: false},
+                    {time: "11:20", special: false},
+                    {time: "11:40", special: false},
+                    {time: "12:00", special: false},
+                    {time: "12:20", special: false},
+                    {time: "12:40", special: false},
+                    {time: "13:00", special: false},
+                    {time: "13:20", special: false},
+                    {time: "13:40", special: false},
+                    {time: "14:00", special: false},
+                    {time: "14:20", special: false},
+                    {time: "14:40", special: false},
+                    {time: "15:00", special: false},
+                    {time: "15:20", special: false},
+                    {time: "15:40", special: false},
+                    {time: "16:00", special: false},
+                    {time: "16:15", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:45", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:15", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:45", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:15", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:45", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:15", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:45", special: false},
+                    {time: "20:00", special: false},
+                    {time: "20:20", special: false},
+                    {time: "20:40", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:10", special: true},
+                    {time: "22:40", special: true}
+                ]
+            },
+            "sc-vc": {
+                "weekday": [
+                    {time: "07:10", special: false},
+                    {time: "07:22", special: false},
+                    {time: "07:27", special: false},
+                    {time: "07:37", special: false},
+                    {time: "07:47", special: false},
+                    {time: "07:57", special: false},
+                    {time: "08:07", special: false},
+                    {time: "08:17", special: false},
+                    {time: "08:27", special: false},
+                    {time: "08:37", special: false},
+                    {time: "08:47", special: false},
+                    {time: "08:57", special: false},
+                    {time: "09:10", special: false},
+                    {time: "09:30", special: false},
+                    {time: "09:50", special: false},
+                    {time: "10:10", special: false},
+                    {time: "10:30", special: false},
+                    {time: "10:50", special: false},
+                    {time: "11:10", special: false},
+                    {time: "11:30", special: false},
+                    {time: "11:50", special: false},
+                    {time: "12:10", special: false},
+                    {time: "12:30", special: false},
+                    {time: "12:50", special: false},
+                    {time: "13:10", special: false},
+                    {time: "13:30", special: false},
+                    {time: "13:50", special: false},
+                    {time: "14:00", special: true},
+                    {time: "14:30", special: false},
+                    {time: "14:50", special: false},
+                    {time: "15:00", special: true},
+                    {time: "15:30", special: false},
+                    {time: "15:50", special: false},
+                    {time: "16:10", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:50", special: false},
+                    {time: "17:10", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:50", special: false},
+                    {time: "18:10", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:50", special: false},
+                    {time: "19:10", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:50", special: false},
+                    {time: "20:10", special: false},
+                    {time: "20:15", special: true},
+                    {time: "20:30", special: true},
+                    {time: "20:55", special: true},
+                    {time: "21:15", special: true},
+                    {time: "21:35", special: true},
+                    {time: "21:55", special: true},
+                    {time: "22:15", special: true},
+                    {time: "22:45", special: true},
+                    {time: "23:15", special: true}
+                ],
+                "weekend": [
+                    {time: "07:10", special: false},
+                    {time: "07:30", special: false},
+                    {time: "07:50", special: false},
+                    {time: "08:10", special: false},
+                    {time: "08:30", special: false},
+                    {time: "08:50", special: false},
+                    {time: "09:10", special: false},
+                    {time: "09:30", special: false},
+                    {time: "09:50", special: false},
+                    {time: "10:10", special: false},
+                    {time: "10:30", special: false},
+                    {time: "10:50", special: false},
+                    {time: "11:10", special: false},
+                    {time: "11:30", special: false},
+                    {time: "11:50", special: false},
+                    {time: "12:10", special: false},
+                    {time: "12:30", special: false},
+                    {time: "12:50", special: false},
+                    {time: "13:10", special: false},
+                    {time: "13:30", special: false},
+                    {time: "13:50", special: false},
+                    {time: "14:10", special: false},
+                    {time: "14:30", special: false},
+                    {time: "14:50", special: false},
+                    {time: "15:10", special: false},
+                    {time: "15:30", special: false},
+                    {time: "15:50", special: false},
+                    {time: "16:10", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:50", special: false},
+                    {time: "17:10", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:50", special: false},
+                    {time: "18:10", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:50", special: false},
+                    {time: "19:10", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:50", special: false},
+                    {time: "20:10", special: false},
+                    {time: "20:30", special: false},
+                    {time: "20:50", special: true},
+                    {time: "21:15", special: true},
+                    {time: "21:35", special: true},
+                    {time: "21:55", special: true},
+                    {time: "22:15", special: true},
+                    {time: "22:45", special: true},
+                    {time: "23:15", special: true}
+                ]
+            },
+            "vc-sc": {
+                "weekday": [
+                    {time: "06:15", special: true},
+                    {time: "06:30", special: true},
+                    {time: "06:40", special: true},
+                    {time: "07:00", special: false},
+                    {time: "07:15", special: false},
+                    {time: "07:20", special: false},
+                    {time: "07:30", special: false},
+                    {time: "07:40", special: false},
+                    {time: "07:50", special: false},
+                    {time: "08:00", special: false},
+                    {time: "08:10", special: false},
+                    {time: "08:20", special: false},
+                    {time: "08:30", special: false},
+                    {time: "08:40", special: false},
+                    {time: "08:50", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:20", special: false},
+                    {time: "09:40", special: false},
+                    {time: "10:00", special: false},
+                    {time: "10:20", special: false},
+                    {time: "10:40", special: false},
+                    {time: "11:00", special: false},
+                    {time: "11:20", special: false},
+                    {time: "11:40", special: false},
+                    {time: "12:00", special: false},
+                    {time: "12:20", special: false},
+                    {time: "12:40", special: false},
+                    {time: "13:00", special: false},
+                    {time: "13:20", special: false},
+                    {time: "13:40", special: false},
+                    {time: "14:00", special: true},
+                    {time: "14:20", special: false},
+                    {time: "14:40", special: false},
+                    {time: "15:00", special: true},
+                    {time: "15:20", special: false},
+                    {time: "15:40", special: false},
+                    {time: "16:00", special: false},
+                    {time: "16:20", special: false},
+                    {time: "16:40", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:20", special: false},
+                    {time: "17:40", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:20", special: false},
+                    {time: "18:40", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:20", special: false},
+                    {time: "19:40", special: false},
+                    {time: "20:00", special: false},
+                    {time: "20:20", special: true},
+                    {time: "20:40", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:10", special: true},
+                    {time: "22:40", special: true}
+                ],
+                "weekend": [
+                    {time: "06:15", special: true},
+                    {time: "06:35", special: true},
+                    {time: "07:00", special: false},
+                    {time: "07:20", special: false},
+                    {time: "07:40", special: false},
+                    {time: "08:00", special: false},
+                    {time: "08:20", special: false},
+                    {time: "08:40", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:20", special: false},
+                    {time: "09:40", special: false},
+                    {time: "10:00", special: false},
+                    {time: "10:20", special: false},
+                    {time: "10:40", special: false},
+                    {time: "11:00", special: false},
+                    {time: "11:20", special: false},
+                    {time: "11:40", special: false},
+                    {time: "12:00", special: false},
+                    {time: "12:20", special: false},
+                    {time: "12:40", special: false},
+                    {time: "13:00", special: false},
+                    {time: "13:20", special: false},
+                    {time: "13:40", special: false},
+                    {time: "14:00", special: false},
+                    {time: "14:20", special: false},
+                    {time: "14:40", special: false},
+                    {time: "15:00", special: false},
+                    {time: "15:20", special: false},
+                    {time: "15:40", special: false},
+                    {time: "16:00", special: false},
+                    {time: "16:20", special: false},
+                    {time: "16:40", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:20", special: false},
+                    {time: "17:40", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:20", special: false},
+                    {time: "18:40", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:20", special: false},
+                    {time: "19:40", special: false},
+                    {time: "20:00", special: false},
+                    {time: "20:20", special: false},
+                    {time: "20:40", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:10", special: true},
+                    {time: "22:40", special: true}
                 ]
             }
         };
 
-        // Public holidays in Hong Kong for 2025
-        const publicHolidays = [
-            // Standard holidays
+        const holidays = [
             {date: "2025-01-01", name: "New Year's Day", nameZh: "新年"},
             {date: "2025-01-29", name: "Lunar New Year's Day", nameZh: "農曆新年"},
             {date: "2025-01-30", name: "2nd day of Lunar New Year", nameZh: "農曆新年初二"},
@@ -1266,32 +1881,59 @@
             {date: "2025-05-01", name: "Labor Day", nameZh: "勞動節"},
             {date: "2025-05-05", name: "Buddha's Birthday", nameZh: "佛誕"},
             {date: "2025-05-31", name: "Tuen Ng Festival", nameZh: "端午節"},
-            {date: "2025-07-01", name: "HKSAR Establishment Day", nameZh: "香港特別行政區成立紀念日"},
+            {date: "2025-07-01", name: "HKSAR Day", nameZh: "香港特區成立紀念日"},
             {date: "2025-10-01", name: "National Day", nameZh: "國慶日"},
-            {date: "2025-10-07", name: "Day after Mid-Autumn Festival", nameZh: "中秋節翌日"},
+            {date: "2025-10-07", name: "Mid-Autumn Festival", nameZh: "中秋節翌日"},
             {date: "2025-10-29", name: "Chung Yeung Festival", nameZh: "重陽節"},
-            {date: "2025-12-25", name: "Christmas Day", nameZh: "聖誕節"},
-            {date: "2025-12-26", name: "Day after Christmas Day", nameZh: "聖誕節翌日"}
+            {date: "2025-12-25", name: "Christmas", nameZh: "聖誕節"},
+            {date: "2025-12-26", name: "Boxing Day", nameZh: "聖誕節翌日"}
         ];
 
-        // Route descriptions for special runs
-        const specialRunDescriptions = {
+        const specDesc = {
             "en": {
-                "ntp-to-vr": "Via Sunshine City",
-                "vr-to-ntp": "Via Sunshine City",
-                "sc-to-vr": "Via Villa Concerto", 
-                "vr-to-sc": "Via Villa Concerto"
+                "ntp-vr": "Via Sunshine City",
+                "vr-ntp": "Via Sunshine City",
+                "sc-vr": "Via Villa Concerto", 
+                "vr-sc": "Via Villa Concerto"
             },
             "zh": {
-                "ntp-to-vr": "途經新港城",
-                "vr-to-ntp": "途經新港城",
-                "sc-to-vr": "經凱弦居", 
-                "vr-to-sc": "經凱弦居"
+                "ntp-vr": "途經新港城",
+                "vr-ntp": "途經新港城",
+                "sc-vr": "經凱弦居", 
+                "vr-sc": "經凱弦居"
+            },
+            "vc": {
+                "en": {
+                    "ntp-vc": "Via Sunshine City",
+                    "vc-ntp": "Via Sunshine City",
+                    "sc-vc": "Via New Town Plaza", 
+                    "vc-sc": "Via New Town Plaza"
+                },
+                "zh": {
+                    "ntp-vc": "途經新港城",
+                    "vc-ntp": "途經新港城",
+                    "sc-vc": "經新城市廣場", 
+                    "vc-sc": "經新城市廣場"
+                }
             }
         };
 
-        // Day type translations
-        const dayTypeText = {
+        const stopsTxt = {
+            "en": {
+                "vc": "Stops at Villa Concerto",
+                "vr": "Stops at Villa Rhapsody",
+                "sc": "Stops at Sunshine City",
+                "ntp": "Stops at New Town Plaza"
+            },
+            "zh": {
+                "vc": "途經凱弦居",
+                "vr": "途經凱琴居",
+                "sc": "途經新港城",
+                "ntp": "途經新城市廣場"
+            }
+        };
+
+        const dayTxt = {
             "en": {
                 "weekday": "Weekday",
                 "saturday": "Saturday",
@@ -1306,144 +1948,175 @@
             }
         };
 
-        // App state
-        let state = {
-            currentLang: 'en',
-            theme: 'light',
-            searchTerm: '',
-            lastUpdateTime: 0,
-            nextBusCache: {},
-            viewMode: 'current'
+        let s = {
+            lang: 'en',
+            searchVR: '',
+            searchVC: '',
+            lastUpdate: 0,
+            mode: 'current',
+            estate: 'vr'
         };
         
-        // Performance optimization: Use requestAnimationFrame for visual updates
-        let animationFrameId = null;
+        let animID = null;
         
-        // Switch between tabs
-        DOM.tabCurrent.addEventListener('click', () => {
-            if (state.viewMode !== 'current') {
-                DOM.tabCurrent.classList.add('active');
-                DOM.tabSchedule.classList.remove('active');
-                DOM.currentView.classList.remove('hidden');
-                DOM.scheduleView.classList.add('hidden');
-                state.viewMode = 'current';
+        D.tabCur.addEventListener('click', () => {
+            if (s.mode !== 'current') {
+                D.tabCur.classList.add('active');
+                D.tabSched.classList.remove('active');
                 
-                // Update next buses when switching to current view
-                updateNextBuses();
-            }
-        });
-        
-        DOM.tabSchedule.addEventListener('click', () => {
-            if (state.viewMode !== 'schedule') {
-                DOM.tabSchedule.classList.add('active');
-                DOM.tabCurrent.classList.remove('active');
-                DOM.scheduleView.classList.remove('hidden');
-                DOM.currentView.classList.add('hidden');
-                state.viewMode = 'schedule';
+                if (s.estate === 'vr') {
+                    D.curVR.classList.remove('hidden');
+                    D.schedVR.classList.add('hidden');
+                } else {
+                    D.curVC.classList.remove('hidden');
+                    D.schedVC.classList.add('hidden');
+                }
                 
-                renderSchedule();
+                s.mode = 'current';
+                updateBuses();
             }
         });
         
-        // Event listeners for schedule controls
-        DOM.routeSelect.addEventListener('change', renderSchedule);
-        DOM.daySelect.addEventListener('change', renderSchedule);
-        
-        // Event listeners for search
-        DOM.timeSearch.addEventListener('input', (e) => {
-            state.searchTerm = e.target.value.trim();
-            renderSchedule();
-        });
-        
-        DOM.clearSearch.addEventListener('click', () => {
-            state.searchTerm = '';
-            DOM.timeSearch.value = '';
-            renderSchedule();
-        });
-        
-        // Language toggle
-        DOM.enToggle.addEventListener('click', () => {
-            if (state.currentLang !== 'en') {
-                state.currentLang = 'en';
-                DOM.enToggle.classList.add('active');
-                DOM.zhToggle.classList.remove('active');
-                updateLanguage();
-                updateDatetimeDisplay(); // Update date/time display with new language
+        D.tabSched.addEventListener('click', () => {
+            if (s.mode !== 'schedule') {
+                D.tabSched.classList.add('active');
+                D.tabCur.classList.remove('active');
+                
+                if (s.estate === 'vr') {
+                    D.schedVR.classList.remove('hidden');
+                    D.curVR.classList.add('hidden');
+                    render('vr');
+                } else {
+                    D.schedVC.classList.remove('hidden');
+                    D.curVC.classList.add('hidden');
+                    render('vc');
+                }
+                
+                s.mode = 'schedule';
             }
         });
         
-        DOM.zhToggle.addEventListener('click', () => {
-            if (state.currentLang !== 'zh') {
-                state.currentLang = 'zh';
-                DOM.zhToggle.classList.add('active');
-                DOM.enToggle.classList.remove('active');
-                updateLanguage();
-                updateDatetimeDisplay(); // Update date/time display with new language
+        D.vrTog.addEventListener('click', () => {
+            if (s.estate !== 'vr') {
+                s.estate = 'vr';
+                D.vrTog.classList.add('active');
+                D.vcTog.classList.remove('active');
+                D.vrView.classList.remove('hidden');
+                D.vcView.classList.add('hidden');
+                
+                if (s.mode === 'current') {
+                    D.curVR.classList.remove('hidden');
+                    D.schedVR.classList.add('hidden');
+                } else {
+                    D.schedVR.classList.remove('hidden');
+                    D.curVR.classList.add('hidden');
+                    render('vr');
+                }
+                
+                updateBuses();
             }
         });
         
-        // Theme toggle
-        DOM.lightToggle.addEventListener('click', () => {
-            if (state.theme !== 'light') {
-                state.theme = 'light';
-                document.documentElement.setAttribute('data-theme', 'light');
-                DOM.lightToggle.classList.add('active');
-                DOM.darkToggle.classList.remove('active');
+        D.vcTog.addEventListener('click', () => {
+            if (s.estate !== 'vc') {
+                s.estate = 'vc';
+                D.vcTog.classList.add('active');
+                D.vrTog.classList.remove('active');
+                D.vcView.classList.remove('hidden');
+                D.vrView.classList.add('hidden');
+                
+                if (s.mode === 'current') {
+                    D.curVC.classList.remove('hidden');
+                    D.schedVC.classList.add('hidden');
+                } else {
+                    D.schedVC.classList.remove('hidden');
+                    D.curVC.classList.add('hidden');
+                    render('vc');
+                }
+                
+                updateBuses();
             }
         });
         
-        DOM.darkToggle.addEventListener('click', () => {
-            if (state.theme !== 'dark') {
-                state.theme = 'dark';
-                document.documentElement.setAttribute('data-theme', 'dark');
-                DOM.darkToggle.classList.add('active');
-                DOM.lightToggle.classList.remove('active');
+        D.routeSelVR.addEventListener('change', () => render('vr'));
+        D.daySelVR.addEventListener('change', () => render('vr'));
+        
+        D.searchVR.addEventListener('input', (e) => {
+            s.searchVR = e.target.value.trim();
+            render('vr');
+        });
+        
+        D.clearVR.addEventListener('click', () => {
+            s.searchVR = '';
+            D.searchVR.value = '';
+            render('vr');
+        });
+        
+        D.routeSelVC.addEventListener('change', () => render('vc'));
+        D.daySelVC.addEventListener('change', () => render('vc'));
+        
+        D.searchVC.addEventListener('input', (e) => {
+            s.searchVC = e.target.value.trim();
+            render('vc');
+        });
+        
+        D.clearVC.addEventListener('click', () => {
+            s.searchVC = '';
+            D.searchVC.value = '';
+            render('vc');
+        });
+        
+        D.enTog.addEventListener('click', () => {
+            if (s.lang !== 'en') {
+                s.lang = 'en';
+                D.enTog.classList.add('active');
+                D.zhTog.classList.remove('active');
+                updateLang();
+                updateDateTime();
             }
         });
         
-        // Check for dark mode preference
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            DOM.darkToggle.click();
+        D.zhTog.addEventListener('click', () => {
+            if (s.lang !== 'zh') {
+                s.lang = 'zh';
+                D.zhTog.classList.add('active');
+                D.enTog.classList.remove('active');
+                updateLang();
+                updateDateTime();
+            }
+        });
+        
+        function updateLang() {
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute(`data-${s.lang}`);
+            });
+            
+            document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+                el.placeholder = el.getAttribute(`data-placeholder-${s.lang}`);
+            });
+            
+            [D.routeSelVR, D.routeSelVC].forEach(sel => {
+                sel.querySelectorAll('option').forEach(op => {
+                    op.textContent = op.getAttribute(`data-${s.lang}`);
+                });
+            });
+            
+            [D.daySelVR, D.daySelVC].forEach(sel => {
+                sel.querySelectorAll('option').forEach(op => {
+                    op.textContent = op.getAttribute(`data-${s.lang}`);
+                });
+            });
+            
+            updateBuses();
+            
+            if (s.mode === 'schedule') {
+                render(s.estate);
+            }
+            
+            updateDayType();
         }
         
-        // Function to update the language
-        function updateLanguage() {
-            const elements = document.querySelectorAll('[data-en]');
-            elements.forEach(el => {
-                el.textContent = el.getAttribute(`data-${state.currentLang}`);
-            });
-            
-            // Update placeholders
-            const placeholders = document.querySelectorAll('[data-placeholder-en]');
-            placeholders.forEach(el => {
-                el.placeholder = el.getAttribute(`data-placeholder-${state.currentLang}`);
-            });
-            
-            // Update the route and day select options
-            const routeOptions = DOM.routeSelect.querySelectorAll('option');
-            routeOptions.forEach(option => {
-                option.textContent = option.getAttribute(`data-${state.currentLang}`);
-            });
-            
-            const dayOptions = DOM.daySelect.querySelectorAll('option');
-            dayOptions.forEach(option => {
-                option.textContent = option.getAttribute(`data-${state.currentLang}`);
-            });
-            
-            // Update the special notices
-            updateNextBuses();
-            
-            // Update the schedule title if in schedule view
-            if (state.viewMode === 'schedule') {
-                renderSchedule();
-            }
-            
-            // Update day type display
-            updateDayTypeDisplay();
-        }
-        
-        // Function to format date based on language
-        function formatDate(date, lang) {
+        function fmtDate(date, lang) {
             if (lang === 'en') {
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 return date.toLocaleDateString('en-US', options);
@@ -1457,74 +2130,64 @@
             }
         }
         
-        // Function to check if a date is a public holiday and get its name
-        function getHolidayInfo(date) {
-            const dateString = date.toISOString().slice(0, 10); // Format as YYYY-MM-DD
-            const holiday = publicHolidays.find(h => h.date === dateString);
+        function getHoliday(date) {
+            const ds = date.toISOString().slice(0, 10);
+            const h = holidays.find(h => h.date === ds);
             
-            if (holiday) {
+            if (h) {
                 return {
                     isHoliday: true,
-                    name: state.currentLang === 'en' ? holiday.name : holiday.nameZh
+                    name: s.lang === 'en' ? h.name : h.nameZh
                 };
             }
             
             return { isHoliday: false, name: '' };
         }
         
-        // Function to update the date and time display (fixed to update every second)
-        function updateDatetimeDisplay() {
+        function updateDateTime() {
             const now = new Date();
             
-            // Update date
-            DOM.currentDate.textContent = formatDate(now, state.currentLang);
+            D.curDate.textContent = fmtDate(now, s.lang);
             
-            // Update time - this now properly updates seconds
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const h = now.getHours().toString().padStart(2, '0');
+            const m = now.getMinutes().toString().padStart(2, '0');
+            const ss = now.getSeconds().toString().padStart(2, '0');
             
-            DOM.hoursEl.textContent = hours;
-            DOM.minutesEl.textContent = minutes;
-            DOM.secondsEl.textContent = seconds;
+            D.hours.textContent = h;
+            D.minutes.textContent = m;
+            D.seconds.textContent = ss;
             
-            // Update day type
-            updateDayTypeDisplay();
+            updateDayType();
         }
         
-        // Function to update the day type display
-        function updateDayTypeDisplay() {
+        function updateDayType() {
             const now = new Date();
-            const dayType = getDayType();
+            const dt = getDayType();
             
-            // Update the text
-            DOM.dayType.textContent = dayTypeText[state.currentLang][dayType];
+            D.dayType.textContent = dayTxt[s.lang][dt];
             
-            // Update the class
-            DOM.dayType.className = 'day-type-display';
-            if (dayType === 'saturday') {
-                DOM.dayType.classList.add('weekend');
-            } else if (dayType === 'sunday' || dayType === 'holiday') {
-                DOM.dayType.classList.add('holiday');
+            D.dayType.className = 'day-disp';
+            if (dt === 'saturday') {
+                D.dayType.classList.add('weekend');
+            } else if (dt === 'sunday' || dt === 'holiday') {
+                D.dayType.classList.add('holiday');
             }
             
-            // Show holiday name if applicable
-            const holidayInfo = getHolidayInfo(now);
-            if (holidayInfo.isHoliday) {
-                DOM.holidayName.textContent = holidayInfo.name;
-                DOM.holidayName.classList.remove('hidden');
+            const h = getHoliday(now);
+            if (h.isHoliday) {
+                D.holidayName.textContent = h.name;
+                D.holidayName.classList.remove('hidden');
             } else {
-                DOM.holidayName.classList.add('hidden');
+                D.holidayName.classList.add('hidden');
             }
         }
         
-        // Function to get the day type (weekday, saturday, sunday, or holiday)
         function getDayType() {
             const now = new Date();
-            const day = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            const day = now.getDay();
             
-            const holidayInfo = getHolidayInfo(now);
-            if (holidayInfo.isHoliday) {
+            const h = getHoliday(now);
+            if (h.isHoliday) {
                 return 'holiday';
             }
             
@@ -1537,310 +2200,323 @@
             }
         }
         
-        // Function to check if it's a weekday schedule or weekend/holiday schedule
-        function isWeekdaySchedule() {
-            const dayType = getDayType();
-            return dayType === 'weekday'; // Only return true for regular weekdays
+        function isWeekday() {
+            const dt = getDayType();
+            return dt === 'weekday';
         }
         
-        // Helper function to convert time string to minutes
-        function timeToMinutes(timeString) {
-            const [hours, minutes] = timeString.split(':').map(Number);
-            return hours * 60 + minutes;
+        function toMins(t) {
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + m;
         }
         
-        // Function to get both next and previous buses
-        function getBusTimings(routeKey) {
+        function getBus(key, estate) {
             const now = new Date();
-            const dayType = isWeekdaySchedule() ? "weekday" : "weekend";
-            const schedule = busSchedules[routeKey][dayType];
+            const dt = isWeekday() ? "weekday" : "weekend";
             
-            const currentHours = now.getHours();
-            const currentMinutes = now.getMinutes();
-            const currentSeconds = now.getSeconds();  // Include seconds for more precise calculations
-            const currentTimeInMinutes = currentHours * 60 + currentMinutes + (currentSeconds / 60);
+            const sch = estate === 'vr' ? schVR : schVC;
+            const schedule = sch[key][dt];
             
-            let nextBusIndex = -1;
-            let prevBusIndex = -1;
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const curMins = h * 60 + m + (s / 60);
             
-            // Find the next bus
+            let nextIdx = -1;
+            let prevIdx = -1;
+            
             for (let i = 0; i < schedule.length; i++) {
-                const busTimeInMinutes = timeToMinutes(schedule[i].time);
+                const busMins = toMins(schedule[i].time);
                 
-                if (busTimeInMinutes > currentTimeInMinutes) {
-                    nextBusIndex = i;
-                    prevBusIndex = i > 0 ? i - 1 : schedule.length - 1; // Previous bus or last bus from yesterday
+                if (busMins > curMins) {
+                    nextIdx = i;
+                    prevIdx = i > 0 ? i - 1 : schedule.length - 1;
                     break;
                 }
             }
             
-            // If no next bus found today, it's the first bus tomorrow
-            if (nextBusIndex === -1) {
-                nextBusIndex = 0; // First bus tomorrow
-                prevBusIndex = schedule.length - 1; // Last bus today
+            if (nextIdx === -1) {
+                nextIdx = 0;
+                prevIdx = schedule.length - 1;
             }
             
-            const nextBus = schedule[nextBusIndex];
-            const prevBus = schedule[prevBusIndex];
+            const next = schedule[nextIdx];
+            const prev = schedule[prevIdx];
             
-            // Calculate time until next bus
-            const nextBusTimeInMinutes = timeToMinutes(nextBus.time);
-            let minutesUntil;
-            let isTomorrow = false;
+            const nextMins = toMins(next.time);
+            let until;
+            let tmrw = false;
             
-            if (nextBusTimeInMinutes > currentTimeInMinutes) {
-                // Next bus is later today
-                minutesUntil = nextBusTimeInMinutes - currentTimeInMinutes;
+            if (nextMins > curMins) {
+                until = nextMins - curMins;
             } else {
-                // Next bus is tomorrow
-                minutesUntil = (24 * 60 - currentTimeInMinutes) + nextBusTimeInMinutes;
-                isTomorrow = true;
+                until = (24 * 60 - curMins) + nextMins;
+                tmrw = true;
             }
             
-            // Calculate progress between buses
-            const prevBusTimeInMinutes = timeToMinutes(prevBus.time);
-            let totalInterval;
+            const prevMins = toMins(prev.time);
+            let total;
             let elapsed;
             
-            if (prevBusTimeInMinutes < nextBusTimeInMinutes && !isTomorrow) {
-                // Normal case: prev bus was earlier today, next bus is later today
-                totalInterval = nextBusTimeInMinutes - prevBusTimeInMinutes;
-                elapsed = currentTimeInMinutes - prevBusTimeInMinutes;
-            } else if (isTomorrow) {
-                // Next bus is tomorrow
-                totalInterval = (24 * 60 - prevBusTimeInMinutes) + nextBusTimeInMinutes;
-                elapsed = currentTimeInMinutes - prevBusTimeInMinutes;
+            if (prevMins < nextMins && !tmrw) {
+                total = nextMins - prevMins;
+                elapsed = curMins - prevMins;
+            } else if (tmrw) {
+                total = (24 * 60 - prevMins) + nextMins;
+                elapsed = curMins - prevMins;
                 if (elapsed < 0) {
-                    // If elapsed is negative, previous bus was yesterday
                     elapsed += 24 * 60;
                 }
             } else {
-                // Previous bus was yesterday (unlikely case)
-                totalInterval = nextBusTimeInMinutes + (24 * 60 - prevBusTimeInMinutes);
-                elapsed = currentTimeInMinutes + (24 * 60 - prevBusTimeInMinutes);
+                total = nextMins + (24 * 60 - prevMins);
+                elapsed = curMins + (24 * 60 - prevMins);
             }
             
-            // Ensure progress is between 0 and 100%
-            const progressPercent = Math.min(100, Math.max(0, (elapsed / totalInterval) * 100));
+            const prog = Math.min(100, Math.max(0, (elapsed / total) * 100));
+            
+            let interVia = null;
+            if (interRoutes[estate] && interRoutes[estate][key]) {
+                interVia = interRoutes[estate][key];
+            }
+            
+            let specVia = null;
+            if (next.special && specVia && specVia[estate] && specVia[estate][key]) {
+                specVia = specVia[estate][key];
+            }
             
             return {
-                next: nextBus,
-                prev: prevBus,
-                minutesUntil: minutesUntil,
-                progressPercent: progressPercent,
-                tomorrow: isTomorrow
+                next,
+                prev,
+                until,
+                prog,
+                tmrw,
+                interVia,
+                specVia
             };
         }
         
-        // Function to format minutes into hours and minutes
-        function formatMinutes(minutes) {
-            const totalMinutes = Math.floor(minutes);
-            const seconds = Math.floor((minutes - totalMinutes) * 60);
+        function fmtMins(mins) {
+            const total = Math.floor(mins);
+            const s = Math.floor((mins - total) * 60);
             
-            if (totalMinutes < 60) {
-                return `${totalMinutes} min ${seconds} sec`;
+            if (total < 60) {
+                return `${total} min ${s} sec`;
             } else {
-                const hours = Math.floor(totalMinutes / 60);
-                const mins = totalMinutes % 60;
-                return `${hours} hr ${mins} min ${seconds} sec`;
+                const h = Math.floor(total / 60);
+                const m = total % 60;
+                return `${h} hr ${m} min ${s} sec`;
             }
         }
         
-        // Function to update a single next bus display with accurate progress bar
-        function updateNextBusDisplay(routeKey, elements, specialDescriptions) {
-            const busTimings = getBusTimings(routeKey);
-            const nextBus = busTimings.next;
+        function updateBusDisplay(key, el, estate) {
+            const bus = getBus(key, estate);
+            const next = bus.next;
             
-            // Update the time
-            elements.time.textContent = nextBus.time;
-            if (nextBus.special) {
-                elements.time.classList.add('special');
-                elements.notice.textContent = state.currentLang === 'en' ? 
-                    "Special Run - " + specialDescriptions.en[routeKey] :
-                    "特別班次 - " + specialDescriptions.zh[routeKey];
+            el.time.textContent = next.time;
+            if (next.special) {
+                el.time.classList.add('special');
+                
+                const desc = estate === 'vr' 
+                    ? specDesc[s.lang][key]
+                    : specDesc.vc[s.lang][key];
+                
+                el.note.textContent = s.lang === 'en' 
+                    ? "Special Run - " + desc
+                    : "特別班次 - " + desc;
             } else {
-                elements.time.classList.remove('special');
-                elements.notice.textContent = "";
+                el.time.classList.remove('special');
+                el.note.textContent = "";
             }
             
-            // Update the countdown text
-            const countdownText = busTimings.tomorrow 
-                ? (state.currentLang === 'en' ? 
-                   `Arriving tomorrow in ${formatMinutes(busTimings.minutesUntil)}` :
-                   `明天到達，還剩 ${formatMinutes(busTimings.minutesUntil)}`)
-                : (state.currentLang === 'en' ? 
-                   `Arriving in ${formatMinutes(busTimings.minutesUntil)}` :
-                   `到達時間剩餘 ${formatMinutes(busTimings.minutesUntil)}`);
-            elements.countdown.textContent = countdownText;
+            // Set stops information in the stops note element
+            if (bus.interVia) {
+                el.stops.textContent = stopsTxt[s.lang][bus.interVia];
+                el.stops.classList.remove('hidden');
+            } else {
+                el.stops.textContent = "";
+                el.stops.classList.add('hidden');
+            }
             
-            // Update the progress bar - now accurately representing progress between buses
-            elements.progress.style.width = busTimings.progressPercent + '%';
+            // Add special via info if available
+            if (next.special && key in specVia[estate]) {
+                const viaPlace = specVia[estate][key];
+                const stopMsg = stopsTxt[s.lang][viaPlace];
+                el.stops.textContent = stopMsg;
+                el.stops.classList.remove('hidden');
+            }
             
-            return nextBus;
+            const cdText = bus.tmrw 
+                ? (s.lang === 'en' ? 
+                   `Arriving tomorrow in ${fmtMins(bus.until)}` :
+                   `明天到達，還剩 ${fmtMins(bus.until)}`)
+                : (s.lang === 'en' ? 
+                   `Arriving in ${fmtMins(bus.until)}` :
+                   `到達時間剩餘 ${fmtMins(bus.until)}`);
+            el.cdown.textContent = cdText;
+            
+            el.prog.style.width = bus.prog + '%';
+            
+            return {
+                bus: next,
+                interVia: bus.interVia
+            };
         }
         
-        // Function to update all next bus information
-        function updateNextBuses() {
-            // Make this less restrictive - it now updates every second
+        function updateBuses() {
             const now = Date.now();
-            state.lastUpdateTime = now;
+            s.lastUpdate = now;
             
-            if (state.viewMode !== 'current') {
-                return; // Don't update when not in the current view
+            if (s.mode !== 'current') return;
+            
+            if (s.estate === 'vr') {
+                updateBusDisplay('ntp-vr', D.nextNTPVR, 'vr');
+                updateBusDisplay('vr-ntp', D.nextVRNTP, 'vr');
+                updateBusDisplay('sc-vr', D.nextSCVR, 'vr');
+                updateBusDisplay('vr-sc', D.nextVRSC, 'vr');
+            } else {
+                updateBusDisplay('ntp-vc', D.nextNTPVC, 'vc');
+                updateBusDisplay('vc-ntp', D.nextVCNTP, 'vc');
+                updateBusDisplay('sc-vc', D.nextSCVC, 'vc');
+                updateBusDisplay('vc-sc', D.nextVCSC, 'vc');
             }
-            
-            // Update each route
-            updateNextBusDisplay('ntp-to-vr', DOM.nextNTPtoVR, specialRunDescriptions);
-            updateNextBusDisplay('vr-to-ntp', DOM.nextVRtoNTP, specialRunDescriptions);
-            updateNextBusDisplay('sc-to-vr', DOM.nextSCtoVR, specialRunDescriptions);
-            updateNextBusDisplay('vr-to-sc', DOM.nextVRtoSC, specialRunDescriptions);
         }
         
-        // Function to filter times based on search
-        function filterTimes(times, searchTerm) {
-            if (!searchTerm) return times;
-            
-            return times.filter(bus => {
-                return bus.time.includes(searchTerm);
-            });
+        function filterTimes(times, search) {
+            if (!search) return times;
+            return times.filter(b => b.time.includes(search));
         }
         
-        // Function to render the schedule
-        function renderSchedule() {
-            if (state.viewMode !== 'schedule') {
-                return; // Don't render when not in schedule view
-            }
+        function render(estate) {
+            if (s.mode !== 'schedule') return;
             
-            const routeKey = DOM.routeSelect.value;
-            const dayType = DOM.daySelect.value;
-            const schedule = busSchedules[routeKey][dayType];
+            const dom = estate === 'vr' 
+                ? {
+                    routeSel: D.routeSelVR,
+                    daySel: D.daySelVR,
+                    grid: D.gridVR,
+                    title: D.schedTitleVR
+                }
+                : {
+                    routeSel: D.routeSelVC,
+                    daySel: D.daySelVC,
+                    grid: D.gridVC,
+                    title: D.schedTitleVC
+                };
+                
+            const search = estate === 'vr' ? s.searchVR : s.searchVC;
+            const sch = estate === 'vr' ? schVR : schVC;
             
-            // Update the title based on the selected route
-            let titleText = DOM.routeSelect.options[DOM.routeSelect.selectedIndex].textContent;
-            DOM.scheduleTitle.textContent = titleText;
+            const key = dom.routeSel.value;
+            const dayType = dom.daySel.value;
+            const schedule = sch[key][dayType];
             
-            // Filter based on search term
-            const filteredSchedule = filterTimes(schedule, state.searchTerm);
+            dom.title.textContent = dom.routeSel.options[dom.routeSel.selectedIndex].textContent;
             
-            // Clear the grid
-            DOM.timeGrid.innerHTML = '';
+            const filtered = filterTimes(schedule, search);
             
-            // Get the next bus for highlighting
+            dom.grid.innerHTML = '';
+            
             const now = new Date();
-            const currentDayType = isWeekdaySchedule() ? "weekday" : "weekend";
-            let nextBusTime = null;
+            const curDayType = isWeekday() ? "weekday" : "weekend";
+            let nextTime = null;
             
-            if (currentDayType === dayType) {
-                const busTimings = getBusTimings(routeKey);
-                nextBusTime = busTimings.next.time;
+            if (curDayType === dayType) {
+                const bus = getBus(key, estate);
+                nextTime = bus.next.time;
             }
             
-            // Create a document fragment for better performance
-            const fragment = document.createDocumentFragment();
+            const isInter = interRoutes[estate] && interRoutes[estate][key];
             
-            // Add each time to the grid
-            filteredSchedule.forEach(bus => {
-                const timeCell = document.createElement('div');
-                timeCell.textContent = bus.time;
-                timeCell.classList.add('time-cell');
+            const frag = document.createDocumentFragment();
+            
+            filtered.forEach(bus => {
+                const cell = document.createElement('div');
+                cell.textContent = bus.time;
+                cell.classList.add('time-cell');
                 
                 if (bus.special) {
-                    timeCell.classList.add('special');
+                    cell.classList.add('special');
                 }
                 
-                if (bus.time === nextBusTime && currentDayType === dayType) {
-                    timeCell.classList.add('next');
+                if (bus.time === nextTime && curDayType === dayType) {
+                    cell.classList.add('next');
                 }
                 
-                // Highlight search results
-                if (state.searchTerm && bus.time.includes(state.searchTerm)) {
-                    timeCell.classList.add('highlight');
+                if (isInter) {
+                    cell.classList.add('inter');
                 }
                 
-                fragment.appendChild(timeCell);
+                if (search && bus.time.includes(search)) {
+                    cell.classList.add('highlight');
+                }
+                
+                frag.appendChild(cell);
             });
             
-            // Append all at once for better performance
-            DOM.timeGrid.appendChild(fragment);
+            dom.grid.appendChild(frag);
         }
         
-        // Function to update UI elements periodically
         function updateUI() {
-            // Cancel any existing animation frame
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
+            if (animID) {
+                cancelAnimationFrame(animID);
             }
             
-            updateDatetimeDisplay();
-            updateNextBuses();
+            updateDateTime();
+            updateBuses();
             
-            // If in schedule view, update the highlighted next bus 
-            // only occasionally for performance reasons
-            if (state.viewMode === 'schedule' && Math.random() < 0.1) {  // 10% chance to update
-                renderSchedule();
+            if (s.mode === 'schedule' && Math.random() < 0.1) {
+                render(s.estate);
             }
             
-            // Schedule the next update
-            animationFrameId = requestAnimationFrame(() => {
+            animID = requestAnimationFrame(() => {
                 setTimeout(updateUI, 1000);
             });
         }
         
-        // Function to save user preferences
-        function savePreferences() {
+        function savePrefs() {
             try {
-                localStorage.setItem('busSchedulePrefs', JSON.stringify({
-                    language: state.currentLang,
-                    theme: state.theme
+                localStorage.setItem('busPrefs', JSON.stringify({
+                    lang: s.lang,
+                    estate: s.estate
                 }));
             } catch (e) {
-                console.log('Could not save preferences:', e);
+                console.log('Save error:', e);
             }
         }
         
-        // Function to load user preferences
-        function loadPreferences() {
+        function loadPrefs() {
             try {
-                const prefs = JSON.parse(localStorage.getItem('busSchedulePrefs'));
-                if (prefs) {
-                    // Apply language
-                    if (prefs.language === 'zh') {
-                        DOM.zhToggle.click();
+                const p = JSON.parse(localStorage.getItem('busPrefs'));
+                if (p) {
+                    if (p.lang === 'zh') {
+                        D.zhTog.click();
                     } else {
-                        DOM.enToggle.click();
+                        D.enTog.click();
                     }
                     
-                    // Apply theme
-                    if (prefs.theme === 'dark') {
-                        DOM.darkToggle.click();
+                    if (p.estate === 'vc') {
+                        D.vcTog.click();
                     } else {
-                        DOM.lightToggle.click();
+                        D.vrTog.click();
                     }
                 }
             } catch (e) {
-                console.log('Could not load preferences:', e);
+                console.log('Load error:', e);
             }
         }
         
-        // Initialize the app
         function init() {
-            // Load user preferences
-            loadPreferences();
-            
-            // Initial UI update
+            loadPrefs();
             updateUI();
             
-            // Set the day select to current day type
-            DOM.daySelect.value = isWeekdaySchedule() ? "weekday" : "weekend";
+            const isWkday = isWeekday();
+            D.daySelVR.value = isWkday ? "weekday" : "weekend";
+            D.daySelVC.value = isWkday ? "weekday" : "weekend";
             
-            // Initialize with the current view
-            DOM.tabCurrent.click();
-            
-            // Save preferences on unload
-            window.addEventListener('beforeunload', savePreferences);
+            D.tabCur.click();
+            window.addEventListener('beforeunload', savePrefs);
         }
         
-        // Start the app
         init();
     </script>
 </body>
