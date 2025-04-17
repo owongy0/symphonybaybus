@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Villa Rhapsody Bus Schedule</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-bg: #f5f7fa;
+            --text-color: #2c3e50;
+            --special-run-color: #e67e22;
+            --card-bg: white;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .title-container {
+            margin-bottom: 5px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .datetime-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .day-type-display {
+            display: inline-block;
+            padding: 3px 12px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .day-type-display.weekend {
+            background-color: var(--accent-color);
+        }
+        
+        .day-type-display.holiday {
+            background-color: var(--special-run-color);
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background-color: #ecf0f1;
+            border: none;
+            cursor: pointer;
+            margin: 3px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .language-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .language-toggle button {
+            padding: 5px 10px;
+            background-color: #ecf0f1;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .language-toggle button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .next-buses {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .next-bus-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: var(--shadow);
+            flex: 1 1 300px;
+        }
+        
+        .next-bus-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--light-bg);
+            padding-bottom: 8px;
+        }
+        
+        .time-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin: 12px 0;
+            text-align: center;
+        }
+        
+        .time-display.special {
+            color: var(--special-run-color);
+        }
+        
+        .countdown {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .special-notice {
+            font-size: 0.9rem;
+            color: var(--special-run-color);
+            margin-top: 8px;
+            font-style: italic;
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin: 20px 0 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .schedule-container {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: var(--shadow);
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+        
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .schedule-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        select, button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 0.9rem;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .time-cell {
+            padding: 8px;
+            text-align: center;
+            background-color: var(--light-bg);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .time-cell.special {
+            background-color: #fef0e6;
+            color: var(--special-run-color);
+            font-weight: bold;
+        }
+        
+        .time-cell.next {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+        
+        .legend-color.regular {
+            background-color: var(--light-bg);
+        }
+        
+        .legend-color.special {
+            background-color: #fef0e6;
+        }
+        
+        .legend-color.next {
+            background-color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .language-toggle {
+                position: static;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+            
+            .title-container {
+                margin-top: 50px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .next-bus-card {
+                flex: 1 1 100%;
+            }
+            
+            .time-grid {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="language-toggle">
+            <button id="en-toggle" class="active">English</button>
+            <button id="zh-toggle">中文</button>
+        </div>
+        
+        <div class="title-container">
+            <h1 data-en="Villa Rhapsody Bus Schedule" data-zh="凱琴居巴士時間表">Villa Rhapsody Bus Schedule</h1>
+        </div>
+        
+        <div class="datetime-display" id="current-datetime"></div>
+        <div class="day-type-display" id="day-type">Weekday</div>
+    </header>
+    
+    <div class="tabs">
+        <button class="tab active" id="tab-current" data-en="Next Buses" data-zh="下一班車">Next Buses</button>
+        <button class="tab" id="tab-schedule" data-en="Full Schedule" data-zh="完整時間表">Full Schedule</button>
+    </div>
+    
+    <div id="current-view">
+        <div class="section-title" data-en="Main Route" data-zh="主線">Main Route</div>
+        <div class="next-buses">
+            <div class="next-bus-card">
+                <h3 data-en="From New Town Plaza to Villa Rhapsody" data-zh="由沙田新城市廣場往凱琴居">From New Town Plaza to Villa Rhapsody</h3>
+                <div class="time-display" id="next-ntp-to-vr">--:--</div>
+                <div class="countdown" id="countdown-ntp-to-vr">Loading...</div>
+                <div class="special-notice" id="special-notice-ntp-to-vr"></div>
+            </div>
+            
+            <div class="next-bus-card">
+                <h3 data-en="From Villa Rhapsody to New Town Plaza" data-zh="由凱琴居往沙田新城市廣場">From Villa Rhapsody to New Town Plaza</h3>
+                <div class="time-display" id="next-vr-to-ntp">--:--</div>
+                <div class="countdown" id="countdown-vr-to-ntp">Loading...</div>
+                <div class="special-notice" id="special-notice-vr-to-ntp"></div>
+            </div>
+        </div>
+        
+        <div class="section-title" data-en="Short Route" data-zh="短途線">Short Route</div>
+        <div class="next-buses">
+            <div class="next-bus-card">
+                <h3 data-en="From Sunshine City to Villa Rhapsody" data-zh="由馬鞍山新港城往凱琴居">From Sunshine City to Villa Rhapsody</h3>
+                <div class="time-display" id="next-sc-to-vr">--:--</div>
+                <div class="countdown" id="countdown-sc-to-vr">Loading...</div>
+                <div class="special-notice" id="special-notice-sc-to-vr"></div>
+            </div>
+            
+            <div class="next-bus-card">
+                <h3 data-en="From Villa Rhapsody to Sunshine City" data-zh="由凱琴居往馬鞍山新港城">From Villa Rhapsody to Sunshine City</h3>
+                <div class="time-display" id="next-vr-to-sc">--:--</div>
+                <div class="countdown" id="countdown-vr-to-sc">Loading...</div>
+                <div class="special-notice" id="special-notice-vr-to-sc"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="schedule-view" class="hidden">
+        <div class="schedule-container">
+            <div class="schedule-header">
+                <div class="schedule-title" id="schedule-title">Bus Schedule</div>
+                <div class="controls">
+                    <select id="route-select">
+                        <option value="ntp-to-vr" data-en="New Town Plaza to Villa Rhapsody (Main Route)" data-zh="由沙田新城市廣場往凱琴居 (主線)">New Town Plaza to Villa Rhapsody (Main Route)</option>
+                        <option value="vr-to-ntp" data-en="Villa Rhapsody to New Town Plaza (Main Route)" data-zh="由凱琴居往沙田新城市廣場 (主線)">Villa Rhapsody to New Town Plaza (Main Route)</option>
+                        <option value="sc-to-vr" data-en="Sunshine City to Villa Rhapsody (Short Route)" data-zh="由馬鞍山新港城往凱琴居 (短途線)">Sunshine City to Villa Rhapsody (Short Route)</option>
+                        <option value="vr-to-sc" data-en="Villa Rhapsody to Sunshine City (Short Route)" data-zh="由凱琴居往馬鞍山新港城 (短途線)">Villa Rhapsody to Sunshine City (Short Route)</option>
+                    </select>
+                    <select id="day-select">
+                        <option value="weekday" data-en="Monday to Friday" data-zh="星期一至星期五">Monday to Friday</option>
+                        <option value="weekend" data-en="Saturday, Sunday & Public Holiday" data-zh="星期六/日及公眾假期">Saturday, Sunday & Public Holiday</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="time-grid" id="time-grid">
+                <!-- Times will be filled in by JavaScript -->
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color regular"></div>
+                    <span data-en="Regular Service" data-zh="正常班次">Regular Service</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color special"></div>
+                    <span data-en="Special Run" data-zh="特別班次">Special Run</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color next"></div>
+                    <span data-en="Next Bus" data-zh="下一班車">Next Bus</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Bus schedule data
+        const busSchedules = {
+            // MAIN ROUTE
+            "ntp-to-vr": { // New Town Plaza to Villa Rhapsody
+                "weekday": [
+                    {time: "06:35", special: false},
+                    {time: "06:50", special: false},
+                    {time: "07:00", special: false},
+                    {time: "07:15", special: false},
+                    {time: "07:25", special: false},
+                    {time: "07:35", special: false},
+                    {time: "07:50", special: false},
+                    {time: "08:00", special: false},
+                    {time: "08:10", special: false},
+                    {time: "08:25", special: false},
+                    {time: "08:35", special: false},
+                    {time: "08:45", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:15", special: false},
+                    {time: "09:35", special: false},
+                    {time: "09:55", special: false},
+                    {time: "10:15", special: false},
+                    {time: "10:35", special: false},
+                    {time: "10:55", special: false},
+                    {time: "11:15", special: false},
+                    {time: "11:35", special: false},
+                    {time: "11:55", special: false},
+                    {time: "12:15", special: false},
+                    {time: "12:35", special: false},
+                    {time: "12:55", special: false},
+                    {time: "13:15", special: false},
+                    {time: "13:45", special: true},
+                    {time: "14:20", special: false},
+                    {time: "14:45", special: true},
+                    {time: "15:20", special: false},
+                    {time: "15:35", special: false},
+                    {time: "15:55", special: false},
+                    {time: "16:15", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:45", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:15", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:45", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:15", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:45", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:15", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:45", special: false},
+                    {time: "20:00", special: true},
+                    {time: "20:15", special: true},
+                    {time: "20:40", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:00", special: true},
+                    {time: "22:30", special: true},
+                    {time: "23:00", special: true}
+                ],
+                "weekend": [
+                    {time: "06:35", special: false},
+                    {time: "06:55", special: false},
+                    {time: "07:15", special: false},
+                    {time: "07:35", special: false},
+                    {time: "07:55", special: false},
+                    {time: "08:15", special: false},
+                    {time: "08:30", special: false},
+                    {time: "08:45", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:15", special: false},
+                    {time: "09:35", special: false},
+                    {time: "09:55", special: false},
+                    {time: "10:15", special: false},
+                    {time: "10:35", special: false},
+                    {time: "10:55", special: false},
+                    {time: "11:15", special: false},
+                    {time: "11:35", special: false},
+                    {time: "11:55", special: false},
+                    {time: "12:15", special: false},
+                    {time: "12:35", special: false},
+                    {time: "12:55", special: false},
+                    {time: "13:15", special: false},
+                    {time: "13:35", special: false},
+                    {time: "13:55", special: false},
+                    {time: "14:15", special: false},
+                    {time: "14:35", special: false},
+                    {time: "14:55", special: false},
+                    {time: "15:15", special: false},
+                    {time: "15:35", special: false},
+                    {time: "15:55", special: false},
+                    {time: "16:15", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:45", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:15", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:45", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:15", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:45", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:15", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:45", special: false},
+                    {time: "20:00", special: false},
+                    {time: "20:15", special: false},
+                    {time: "20:35", special: true},
+                    {time: "21:00", special: true},
+                    {time: "21:20", special: true},
+                    {time: "21:40", special: true},
+                    {time: "22:00", special: true},
+                    {time: "22:30", special: true},
+                    {time: "23:00", special: true}
+                ]
+            },
+            "vr-to-ntp": { // Villa Rhapsody to New Town Plaza
+                "weekday": [
+                    {time: "06:16", special: true},
+                    {time: "06:31", special: true},
+                    {time: "06:41", special: true},
+                    {time: "07:01", special: false},
+                    {time: "07:11", special: false},
+                    {time: "07:21", special: false},
+                    {time: "07:36", special: false},
+                    {time: "07:46", special: false},
+                    {time: "07:56", special: false},
+                    {time: "08:11", special: false},
+                    {time: "08:21", special: false},
+                    {time: "08:31", special: false},
+                    {time: "08:46", special: false},
+                    {time: "09:01", special: false},
+                    {time: "09:21", special: false},
+                    {time: "09:41", special: false},
+                    {time: "10:01", special: false},
+                    {time: "10:21", special: false},
+                    {time: "10:41", special: false},
+                    {time: "11:01", special: false},
+                    {time: "11:21", special: false},
+                    {time: "11:41", special: false},
+                    {time: "12:01", special: false},
+                    {time: "12:21", special: false},
+                    {time: "12:41", special: false},
+                    {time: "13:01", special: false},
+                    {time: "13:31", special: false},
+                    {time: "14:01", special: true},
+                    {time: "14:30", special: false},
+                    {time: "15:01", special: true},
+                    {time: "15:21", special: false},
+                    {time: "15:41", special: false},
+                    {time: "16:01", special: false},
+                    {time: "16:11", special: false},
+                    {time: "16:31", special: false},
+                    {time: "16:46", special: false},
+                    {time: "17:01", special: false},
+                    {time: "17:16", special: false},
+                    {time: "17:31", special: false},
+                    {time: "17:46", special: false},
+                    {time: "18:01", special: false},
+                    {time: "18:16", special: false},
+                    {time: "18:31", special: false},
+                    {time: "18:46", special: false},
+                    {time: "19:01", special: false},
+                    {time: "19:16", special: false},
+                    {time: "19:31", special: false},
+                    {time: "19:46", special: false},
+                    {time: "20:01", special: false},
+                    {time: "20:21", special: true},
+                    {time: "20:41", special: true},
+                    {time: "21:01", special: true},
+                    {time: "21:21", special: true},
+                    {time: "21:41", special: true},
+                    {time: "22:11", special: true},
+                    {time: "22:41", special: true}
+                ],
+                "weekend": [
+                    {time: "06:16", special: true},
+                    {time: "06:36", special: true},
+                    {time: "07:01", special: false},
+                    {time: "07:21", special: false},
+                    {time: "07:41", special: false},
+                    {time: "08:01", special: false},
+                    {time: "08:16", special: false},
+                    {time: "08:31", special: false},
+                    {time: "08:46", special: false},
+                    {time: "09:01", special: false},
+                    {time: "09:21", special: false},
+                    {time: "09:41", special: false},
+                    {time: "10:01", special: false},
+                    {time: "10:21", special: false},
+                    {time: "10:41", special: false},
+                    {time: "11:01", special: false},
+                    {time: "11:21", special: false},
+                    {time: "11:41", special: false},
+                    {time: "12:01", special: false},
+                    {time: "12:21", special: false},
+                    {time: "12:41", special: false},
+                    {time: "13:01", special: false},
+                    {time: "13:21", special: false},
+                    {time: "13:41", special: false},
+                    {time: "14:01", special: false},
+                    {time: "14:21", special: false},
+                    {time: "14:41", special: false},
+                    {time: "15:01", special: false},
+                    {time: "15:21", special: false},
+                    {time: "15:41", special: false},
+                    {time: "16:01", special: false},
+                    {time: "16:16", special: false},
+                    {time: "16:31", special: false},
+                    {time: "16:46", special: false},
+                    {time: "17:01", special: false},
+                    {time: "17:16", special: false},
+                    {time: "17:31", special: false},
+                    {time: "17:46", special: false},
+                    {time: "18:01", special: false},
+                    {time: "18:16", special: false},
+                    {time: "18:31", special: false},
+                    {time: "18:46", special: false},
+                    {time: "19:01", special: false},
+                    {time: "19:16", special: false},
+                    {time: "19:31", special: false},
+                    {time: "19:46", special: false},
+                    {time: "20:01", special: false},
+                    {time: "20:21", special: false},
+                    {time: "20:41", special: true},
+                    {time: "21:01", special: true},
+                    {time: "21:21", special: true},
+                    {time: "21:41", special: true},
+                    {time: "22:11", special: true},
+                    {time: "22:41", special: true}
+                ]
+            },
+            
+            // SHORT ROUTE
+            "sc-to-vr": { // Sunshine City to Villa Rhapsody
+                "weekday": [
+                    {time: "07:10", special: false},
+                    {time: "07:22", special: false},
+                    {time: "07:27", special: false},
+                    {time: "07:37", special: false},
+                    {time: "07:47", special: false},
+                    {time: "07:57", special: false},
+                    {time: "08:07", special: false},
+                    {time: "08:17", special: false},
+                    {time: "08:27", special: false},
+                    {time: "08:37", special: false},
+                    {time: "08:47", special: false},
+                    {time: "08:57", special: false},
+                    {time: "09:10", special: false},
+                    {time: "09:30", special: false},
+                    {time: "09:50", special: false},
+                    {time: "10:10", special: false},
+                    {time: "10:30", special: false},
+                    {time: "10:50", special: false},
+                    {time: "11:10", special: false},
+                    {time: "11:30", special: false},
+                    {time: "11:50", special: false},
+                    {time: "12:10", special: false},
+                    {time: "12:30", special: false},
+                    {time: "12:50", special: false},
+                    {time: "13:10", special: false},
+                    {time: "13:30", special: false},
+                    {time: "13:50", special: false},
+                    {time: "14:00", special: true},
+                    {time: "14:30", special: false},
+                    {time: "14:50", special: false},
+                    {time: "15:00", special: true},
+                    {time: "15:30", special: false},
+                    {time: "15:50", special: false},
+                    {time: "16:10", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:50", special: false},
+                    {time: "17:10", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:50", special: false},
+                    {time: "18:10", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:50", special: false},
+                    {time: "19:10", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:50", special: false},
+                    {time: "20:10", special: false},
+                    {time: "20:15", special: true},
+                    {time: "20:30", special: true},
+                    {time: "20:55", special: true},
+                    {time: "21:15", special: true},
+                    {time: "21:35", special: true},
+                    {time: "21:55", special: true},
+                    {time: "22:15", special: true},
+                    {time: "22:45", special: true},
+                    {time: "23:15", special: true}
+                ],
+                "weekend": [
+                    {time: "07:10", special: false},
+                    {time: "07:30", special: false},
+                    {time: "07:50", special: false},
+                    {time: "08:10", special: false},
+                    {time: "08:30", special: false},
+                    {time: "08:50", special: false},
+                    {time: "09:10", special: false},
+                    {time: "09:30", special: false},
+                    {time: "09:50", special: false},
+                    {time: "10:10", special: false},
+                    {time: "10:30", special: false},
+                    {time: "10:50", special: false},
+                    {time: "11:10", special: false},
+                    {time: "11:30", special: false},
+                    {time: "11:50", special: false},
+                    {time: "12:10", special: false},
+                    {time: "12:30", special: false},
+                    {time: "12:50", special: false},
+                    {time: "13:10", special: false},
+                    {time: "13:30", special: false},
+                    {time: "13:50", special: false},
+                    {time: "14:10", special: false},
+                    {time: "14:30", special: false},
+                    {time: "14:50", special: false},
+                    {time: "15:10", special: false},
+                    {time: "15:30", special: false},
+                    {time: "15:50", special: false},
+                    {time: "16:10", special: false},
+                    {time: "16:30", special: false},
+                    {time: "16:50", special: false},
+                    {time: "17:10", special: false},
+                    {time: "17:30", special: false},
+                    {time: "17:50", special: false},
+                    {time: "18:10", special: false},
+                    {time: "18:30", special: false},
+                    {time: "18:50", special: false},
+                    {time: "19:10", special: false},
+                    {time: "19:30", special: false},
+                    {time: "19:50", special: false},
+                    {time: "20:10", special: false},
+                    {time: "20:30", special: false},
+                    {time: "20:50", special: true},
+                    {time: "21:15", special: true},
+                    {time: "21:35", special: true},
+                    {time: "21:55", special: true},
+                    {time: "22:15", special: true},
+                    {time: "22:45", special: true},
+                    {time: "23:15", special: true}
+                ]
+            },
+            "vr-to-sc": { // Villa Rhapsody to Sunshine City
+                "weekday": [
+                    {time: "06:16", special: true},
+                    {time: "06:31", special: true},
+                    {time: "06:41", special: true},
+                    {time: "07:00", special: false},
+                    {time: "07:15", special: false},
+                    {time: "07:20", special: false},
+                    {time: "07:30", special: false},
+                    {time: "07:40", special: false},
+                    {time: "07:50", special: false},
+                    {time: "08:00", special: false},
+                    {time: "08:10", special: false},
+                    {time: "08:20", special: false},
+                    {time: "08:30", special: false},
+                    {time: "08:40", special: false},
+                    {time: "08:50", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:20", special: false},
+                    {time: "09:40", special: false},
+                    {time: "10:00", special: false},
+                    {time: "10:20", special: false},
+                    {time: "10:40", special: false},
+                    {time: "11:00", special: false},
+                    {time: "11:20", special: false},
+                    {time: "11:40", special: false},
+                    {time: "12:00", special: false},
+                    {time: "12:20", special: false},
+                    {time: "12:40", special: false},
+                    {time: "13:00", special: false},
+                    {time: "13:20", special: false},
+                    {time: "13:40", special: false},
+                    {time: "14:01", special: true},
+                    {time: "14:20", special: false},
+                    {time: "14:40", special: false},
+                    {time: "15:01", special: true},
+                    {time: "15:20", special: false},
+                    {time: "15:40", special: false},
+                    {time: "16:00", special: false},
+                    {time: "16:20", special: false},
+                    {time: "16:40", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:20", special: false},
+                    {time: "17:40", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:20", special: false},
+                    {time: "18:40", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:20", special: false},
+                    {time: "19:40", special: false},
+                    {time: "20:00", special: false},
+                    {time: "20:21", special: true},
+                    {time: "20:41", special: true},
+                    {time: "21:01", special: true},
+                    {time: "21:21", special: true},
+                    {time: "21:41", special: true},
+                    {time: "22:11", special: true},
+                    {time: "22:41", special: true}
+                ],
+                "weekend": [
+                    {time: "06:16", special: true},
+                    {time: "06:36", special: true},
+                    {time: "07:00", special: false},
+                    {time: "07:20", special: false},
+                    {time: "07:40", special: false},
+                    {time: "08:00", special: false},
+                    {time: "08:20", special: false},
+                    {time: "08:40", special: false},
+                    {time: "09:00", special: false},
+                    {time: "09:20", special: false},
+                    {time: "09:40", special: false},
+                    {time: "10:00", special: false},
+                    {time: "10:20", special: false},
+                    {time: "10:40", special: false},
+                    {time: "11:00", special: false},
+                    {time: "11:20", special: false},
+                    {time: "11:40", special: false},
+                    {time: "12:00", special: false},
+                    {time: "12:20", special: false},
+                    {time: "12:40", special: false},
+                    {time: "13:00", special: false},
+                    {time: "13:20", special: false},
+                    {time: "13:40", special: false},
+                    {time: "14:00", special: false},
+                    {time: "14:20", special: false},
+                    {time: "14:40", special: false},
+                    {time: "15:00", special: false},
+                    {time: "15:20", special: false},
+                    {time: "15:40", special: false},
+                    {time: "16:00", special: false},
+                    {time: "16:20", special: false},
+                    {time: "16:40", special: false},
+                    {time: "17:00", special: false},
+                    {time: "17:20", special: false},
+                    {time: "17:40", special: false},
+                    {time: "18:00", special: false},
+                    {time: "18:20", special: false},
+                    {time: "18:40", special: false},
+                    {time: "19:00", special: false},
+                    {time: "19:20", special: false},
+                    {time: "19:40", special: false},
+                    {time: "20:00", special: false},
+                    {time: "20:20", special: false},
+                    {time: "20:41", special: true},
+                    {time: "21:01", special: true},
+                    {time: "21:21", special: true},
+                    {time: "21:41", special: true},
+                    {time: "22:11", special: true},
+                    {time: "22:41", special: true}
+                ]
+            }
+        };
+
+        // Public holidays in Hong Kong for 2025
+        const publicHolidays = [
+            // Standard holidays
+            "2025-01-01", // New Year's Day
+            "2025-01-29", // Lunar New Year's Day
+            "2025-01-30", // 2nd day of Lunar New Year
+            "2025-01-31", // 3rd day of Lunar New Year
+            "2025-04-04", // Ching Ming Festival
+            "2025-04-18", // Good Friday
+            "2025-04-19", // Day after Good Friday
+            "2025-04-21", // Easter Monday
+            "2025-05-01", // Labor Day
+            "2025-05-05", // Buddha's Birthday
+            "2025-05-31", // Tuen Ng Festival
+            "2025-07-01", // HKSAR Establishment Day
+            "2025-10-01", // National Day
+            "2025-10-07", // Day after Mid-Autumn Festival
+            "2025-10-29", // Chung Yeung Festival
+            "2025-12-25", // Christmas Day
+            "2025-12-26"  // Day after Christmas Day
+        ];
+
+        // Route descriptions for special runs
+        const specialRunDescriptions = {
+            "en": {
+                "ntp-to-vr": "Via Sunshine City",
+                "vr-to-ntp": "Via Sunshine City",
+                "sc-to-vr": "Via Villa Concerto", 
+                "vr-to-sc": "Via Villa Concerto"
+            },
+            "zh": {
+                "ntp-to-vr": "途經新港城",
+                "vr-to-ntp": "途經新港城",
+                "sc-to-vr": "經凱弦居", 
+                "vr-to-sc": "經凱弦居"
+            }
+        };
+
+        // Day type translations
+        const dayTypeText = {
+            "en": {
+                "weekday": "Weekday",
+                "saturday": "Saturday",
+                "sunday": "Sunday",
+                "holiday": "Public Holiday"
+            },
+            "zh": {
+                "weekday": "平日",
+                "saturday": "星期六",
+                "sunday": "星期日",
+                "holiday": "公眾假期"
+            }
+        };
+
+        // DOM elements
+        const currentDatetimeDisplay = document.getElementById('current-datetime');
+        const dayTypeDisplay = document.getElementById('day-type');
+        
+        const tabCurrent = document.getElementById('tab-current');
+        const tabSchedule = document.getElementById('tab-schedule');
+        const currentView = document.getElementById('current-view');
+        const scheduleView = document.getElementById('schedule-view');
+        const routeSelect = document.getElementById('route-select');
+        const daySelect = document.getElementById('day-select');
+        const timeGrid = document.getElementById('time-grid');
+        const scheduleTitle = document.getElementById('schedule-title');
+        
+        // Next bus display elements - Main Route
+        const nextVRtoNTP = document.getElementById('next-vr-to-ntp');
+        const countdownVRtoNTP = document.getElementById('countdown-vr-to-ntp');
+        const specialNoticeVRtoNTP = document.getElementById('special-notice-vr-to-ntp');
+        
+        const nextNTPtoVR = document.getElementById('next-ntp-to-vr');
+        const countdownNTPtoVR = document.getElementById('countdown-ntp-to-vr');
+        const specialNoticeNTPtoVR = document.getElementById('special-notice-ntp-to-vr');
+        
+        // Next bus display elements - Short Route
+        const nextVRtoSC = document.getElementById('next-vr-to-sc');
+        const countdownVRtoSC = document.getElementById('countdown-vr-to-sc');
+        const specialNoticeVRtoSC = document.getElementById('special-notice-vr-to-sc');
+        
+        const nextSCtoVR = document.getElementById('next-sc-to-vr');
+        const countdownSCtoVR = document.getElementById('countdown-sc-to-vr');
+        const specialNoticeSCtoVR = document.getElementById('special-notice-sc-to-vr');
+
+        // Language toggle elements
+        const enToggle = document.getElementById('en-toggle');
+        const zhToggle = document.getElementById('zh-toggle');
+        let currentLang = 'en';
+        
+        // Switch between tabs
+        tabCurrent.addEventListener('click', () => {
+            tabCurrent.classList.add('active');
+            tabSchedule.classList.remove('active');
+            currentView.classList.remove('hidden');
+            scheduleView.classList.add('hidden');
+        });
+        
+        tabSchedule.addEventListener('click', () => {
+            tabSchedule.classList.add('active');
+            tabCurrent.classList.remove('active');
+            scheduleView.classList.remove('hidden');
+            currentView.classList.add('hidden');
+            renderSchedule();
+        });
+        
+        // Event listeners for schedule controls
+        routeSelect.addEventListener('change', renderSchedule);
+        daySelect.addEventListener('change', renderSchedule);
+        
+        // Language toggle
+        enToggle.addEventListener('click', () => {
+            if (currentLang !== 'en') {
+                currentLang = 'en';
+                enToggle.classList.add('active');
+                zhToggle.classList.remove('active');
+                updateLanguage();
+                updateDatetimeDisplay(); // Update date/time display with new language
+            }
+        });
+        
+        zhToggle.addEventListener('click', () => {
+            if (currentLang !== 'zh') {
+                currentLang = 'zh';
+                zhToggle.classList.add('active');
+                enToggle.classList.remove('active');
+                updateLanguage();
+                updateDatetimeDisplay(); // Update date/time display with new language
+            }
+        });
+        
+        // Function to update the language
+        function updateLanguage() {
+            const elements = document.querySelectorAll('[data-en]');
+            elements.forEach(el => {
+                el.textContent = el.getAttribute(`data-${currentLang}`);
+            });
+            
+            // Update the route and day select options
+            const routeOptions = routeSelect.querySelectorAll('option');
+            routeOptions.forEach(option => {
+                option.textContent = option.getAttribute(`data-${currentLang}`);
+            });
+            
+            const dayOptions = daySelect.querySelectorAll('option');
+            dayOptions.forEach(option => {
+                option.textContent = option.getAttribute(`data-${currentLang}`);
+            });
+            
+            // Update the special notices
+            updateNextBuses();
+            
+            // Update the schedule title if in schedule view
+            if (!scheduleView.classList.contains('hidden')) {
+                renderSchedule();
+            }
+            
+            // Update day type display
+            updateDayTypeDisplay();
+        }
+        
+        // Function to format date and time based on language
+        function formatDatetime(date, lang) {
+            if (lang === 'en') {
+                const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+                const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+                
+                const formattedDate = date.toLocaleDateString('en-US', dateOptions);
+                const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
+                
+                return `${formattedDate}, ${formattedTime}`;
+            } else {
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                const weekday = ['日', '一', '二', '三', '四', '五', '六'][date.getDay()];
+                
+                let hours = date.getHours();
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                const seconds = date.getSeconds().toString().padStart(2, '0');
+                
+                const ampm = hours < 12 ? '上午' : '下午';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // Convert 0 to 12
+                
+                return `${year}年${month}月${day}日 (星期${weekday}) ${ampm}${hours}:${minutes}:${seconds}`;
+            }
+        }
+        
+        // Function to update the date and time display
+        function updateDatetimeDisplay() {
+            const now = new Date();
+            currentDatetimeDisplay.textContent = formatDatetime(now, currentLang);
+            updateDayTypeDisplay();
+        }
+        
+        // Function to update the day type display
+        function updateDayTypeDisplay() {
+            const dayType = getDayType();
+            
+            // Update the text
+            dayTypeDisplay.textContent = dayTypeText[currentLang][dayType];
+            
+            // Update the class
+            dayTypeDisplay.className = 'day-type-display';
+            if (dayType === 'saturday') {
+                dayTypeDisplay.classList.add('weekend');
+            } else if (dayType === 'sunday' || dayType === 'holiday') {
+                dayTypeDisplay.classList.add('holiday');
+            }
+        }
+        
+        // Function to check if a date is a public holiday
+        function isPublicHoliday(date) {
+            const dateString = date.toISOString().slice(0, 10); // Format as YYYY-MM-DD
+            return publicHolidays.includes(dateString);
+        }
+        
+        // Function to get the day type (weekday, saturday, sunday, or holiday)
+        function getDayType() {
+            const now = new Date();
+            const day = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            
+            if (isPublicHoliday(now)) {
+                return 'holiday';
+            }
+            
+            if (day === 0) {
+                return 'sunday';
+            } else if (day === 6) {
+                return 'saturday';
+            } else {
+                return 'weekday';
+            }
+        }
+        
+        // Function to check if it's a weekday schedule or weekend/holiday schedule
+        function isWeekdaySchedule() {
+            const dayType = getDayType();
+            return dayType === 'weekday'; // Only return true for regular weekdays
+        }
+        
+        // Function to get the next bus time
+        function getNextBus(routeKey) {
+            const now = new Date();
+            const dayType = isWeekdaySchedule() ? "weekday" : "weekend";
+            const schedule = busSchedules[routeKey][dayType];
+            
+            const currentHours = now.getHours();
+            const currentMinutes = now.getMinutes();
+            const currentSeconds = now.getSeconds();
+            const currentTimeInMinutes = currentHours * 60 + currentMinutes + (currentSeconds / 60);
+            
+            // Find the next bus
+            for (const bus of schedule) {
+                const [hours, minutes] = bus.time.split(':').map(Number);
+                const busTimeInMinutes = hours * 60 + minutes;
+                
+                if (busTimeInMinutes > currentTimeInMinutes) {
+                    return {
+                        time: bus.time,
+                        special: bus.special,
+                        minutesUntil: busTimeInMinutes - currentTimeInMinutes
+                    };
+                }
+            }
+            
+            // If no bus found today, return the first bus of the next day
+            return {
+                time: schedule[0].time,
+                special: schedule[0].special,
+                minutesUntil: (24 * 60 - currentTimeInMinutes) + (parseInt(schedule[0].time.split(':')[0]) * 60 + parseInt(schedule[0].time.split(':')[1])),
+                tomorrow: true
+            };
+        }
+        
+        // Function to format minutes into hours and minutes
+        function formatMinutes(minutes) {
+            const totalMinutes = Math.floor(minutes);
+            const seconds = Math.floor((minutes - totalMinutes) * 60);
+            
+            if (totalMinutes < 60) {
+                return `${totalMinutes} min ${seconds} sec`;
+            } else {
+                const hours = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                return `${hours} hr ${mins} min ${seconds} sec`;
+            }
+        }
+        
+        // Function to update the next bus information
+        function updateNextBuses() {
+            // Main Route: New Town Plaza to Villa Rhapsody
+            const nextBusNTPtoVR = getNextBus('ntp-to-vr');
+            nextNTPtoVR.textContent = nextBusNTPtoVR.time;
+            if (nextBusNTPtoVR.special) {
+                nextNTPtoVR.classList.add('special');
+                specialNoticeNTPtoVR.textContent = currentLang === 'en' ? 
+                    "Special Run - " + specialRunDescriptions.en['ntp-to-vr'] :
+                    "特別班次 - " + specialRunDescriptions.zh['ntp-to-vr'];
+            } else {
+                nextNTPtoVR.classList.remove('special');
+                specialNoticeNTPtoVR.textContent = "";
+            }
+            
+            const ntpVrCountdownText = nextBusNTPtoVR.tomorrow 
+                ? (currentLang === 'en' ? 
+                   `Arriving tomorrow in ${formatMinutes(nextBusNTPtoVR.minutesUntil)}` :
+                   `明天到達，還剩 ${formatMinutes(nextBusNTPtoVR.minutesUntil)}`)
+                : (currentLang === 'en' ? 
+                   `Arriving in ${formatMinutes(nextBusNTPtoVR.minutesUntil)}` :
+                   `到達時間剩餘 ${formatMinutes(nextBusNTPtoVR.minutesUntil)}`);
+            countdownNTPtoVR.textContent = ntpVrCountdownText;
+            
+            // Main Route: Villa Rhapsody to New Town Plaza
+            const nextBusVRtoNTP = getNextBus('vr-to-ntp');
+            nextVRtoNTP.textContent = nextBusVRtoNTP.time;
+            if (nextBusVRtoNTP.special) {
+                nextVRtoNTP.classList.add('special');
+                specialNoticeVRtoNTP.textContent = currentLang === 'en' ? 
+                    "Special Run - " + specialRunDescriptions.en['vr-to-ntp'] :
+                    "特別班次 - " + specialRunDescriptions.zh['vr-to-ntp'];
+            } else {
+                nextVRtoNTP.classList.remove('special');
+                specialNoticeVRtoNTP.textContent = "";
+            }
+            
+            const vrNtpCountdownText = nextBusVRtoNTP.tomorrow 
+                ? (currentLang === 'en' ? 
+                   `Arriving tomorrow in ${formatMinutes(nextBusVRtoNTP.minutesUntil)}` :
+                   `明天到達，還剩 ${formatMinutes(nextBusVRtoNTP.minutesUntil)}`)
+                : (currentLang === 'en' ? 
+                   `Arriving in ${formatMinutes(nextBusVRtoNTP.minutesUntil)}` :
+                   `到達時間剩餘 ${formatMinutes(nextBusVRtoNTP.minutesUntil)}`);
+            countdownVRtoNTP.textContent = vrNtpCountdownText;
+            
+            // Short Route: Sunshine City to Villa Rhapsody
+            const nextBusSCtoVR = getNextBus('sc-to-vr');
+            nextSCtoVR.textContent = nextBusSCtoVR.time;
+            if (nextBusSCtoVR.special) {
+                nextSCtoVR.classList.add('special');
+                specialNoticeSCtoVR.textContent = currentLang === 'en' ? 
+                    "Special Run - " + specialRunDescriptions.en['sc-to-vr'] :
+                    "特別班次 - " + specialRunDescriptions.zh['sc-to-vr'];
+            } else {
+                nextSCtoVR.classList.remove('special');
+                specialNoticeSCtoVR.textContent = "";
+            }
+            
+            const scVrCountdownText = nextBusSCtoVR.tomorrow 
+                ? (currentLang === 'en' ? 
+                   `Arriving tomorrow in ${formatMinutes(nextBusSCtoVR.minutesUntil)}` :
+                   `明天到達，還剩 ${formatMinutes(nextBusSCtoVR.minutesUntil)}`)
+                : (currentLang === 'en' ? 
+                   `Arriving in ${formatMinutes(nextBusSCtoVR.minutesUntil)}` :
+                   `到達時間剩餘 ${formatMinutes(nextBusSCtoVR.minutesUntil)}`);
+            countdownSCtoVR.textContent = scVrCountdownText;
+            
+            // Short Route: Villa Rhapsody to Sunshine City
+            const nextBusVRtoSC = getNextBus('vr-to-sc');
+            nextVRtoSC.textContent = nextBusVRtoSC.time;
+            if (nextBusVRtoSC.special) {
+                nextVRtoSC.classList.add('special');
+                specialNoticeVRtoSC.textContent = currentLang === 'en' ? 
+                    "Special Run - " + specialRunDescriptions.en['vr-to-sc'] :
+                    "特別班次 - " + specialRunDescriptions.zh['vr-to-sc'];
+            } else {
+                nextVRtoSC.classList.remove('special');
+                specialNoticeVRtoSC.textContent = "";
+            }
+            
+            const vrScCountdownText = nextBusVRtoSC.tomorrow 
+                ? (currentLang === 'en' ? 
+                   `Arriving tomorrow in ${formatMinutes(nextBusVRtoSC.minutesUntil)}` :
+                   `明天到達，還剩 ${formatMinutes(nextBusVRtoSC.minutesUntil)}`)
+                : (currentLang === 'en' ? 
+                   `Arriving in ${formatMinutes(nextBusVRtoSC.minutesUntil)}` :
+                   `到達時間剩餘 ${formatMinutes(nextBusVRtoSC.minutesUntil)}`);
+            countdownVRtoSC.textContent = vrScCountdownText;
+        }
+        
+        // Function to render the schedule
+        function renderSchedule() {
+            const routeKey = routeSelect.value;
+            const dayType = daySelect.value;
+            const schedule = busSchedules[routeKey][dayType];
+            
+            // Update the title based on the selected route
+            let titleText = routeSelect.options[routeSelect.selectedIndex].textContent;
+            scheduleTitle.textContent = titleText;
+            
+            // Clear the grid
+            timeGrid.innerHTML = '';
+            
+            // Get the next bus for highlighting
+            const now = new Date();
+            const currentDayType = isWeekdaySchedule() ? "weekday" : "weekend";
+            let nextBusTime = null;
+            
+            if (currentDayType === dayType) {
+                const nextBus = getNextBus(routeKey);
+                nextBusTime = nextBus.time;
+            }
+            
+            // Add each time to the grid
+            schedule.forEach(bus => {
+                const timeCell = document.createElement('div');
+                timeCell.textContent = bus.time;
+                timeCell.classList.add('time-cell');
+                
+                if (bus.special) {
+                    timeCell.classList.add('special');
+                }
+                
+                if (bus.time === nextBusTime && currentDayType === dayType) {
+                    timeCell.classList.add('next');
+                }
+                
+                timeGrid.appendChild(timeCell);
+            });
+        }
+        
+        // Initialize the app
+        function init() {
+            updateDatetimeDisplay();
+            updateNextBuses();
+            
+            // Update time every second
+            setInterval(() => {
+                updateDatetimeDisplay();
+                updateNextBuses();
+                
+                // If in schedule view, update the highlighted next bus
+                if (!scheduleView.classList.contains('hidden')) {
+                    renderSchedule();
+                }
+            }, 1000); // 1000 milliseconds = 1 second
+            
+            // Set the day select to current day type
+            daySelect.value = isWeekdaySchedule() ? "weekday" : "weekend";
+            
+            // Initialize with the current view
+            tabCurrent.click();
+        }
+        
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
