@@ -1,27 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Villa Rhapsody Bus Schedule</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
         :root {
+            /* Light theme (default) */
             --primary-color: #3498db;
+            --primary-light: rgba(52, 152, 219, 0.2);
             --secondary-color: #2980b9;
             --accent-color: #e74c3c;
             --light-bg: #f5f7fa;
             --text-color: #2c3e50;
+            --text-secondary: #7f8c8d;
             --special-run-color: #e67e22;
             --card-bg: white;
             --shadow: 0 2px 10px rgba(0,0,0,0.1);
             --next-bus-border: 3px solid var(--primary-color);
+            --special-bg: #fef0e6;
+            --input-bg: white;
+            --input-border: #ddd;
+            --toggle-bg: #ecf0f1;
+            --toggle-text: #333;
+            --datetime-bg: rgba(52, 152, 219, 0.1);
+            --date-text: #2c3e50;
+            --time-text: #3498db;
+            --holiday-badge: #e74c3c;
+        }
+        
+        /* Dark theme */
+        [data-theme="dark"] {
+            --primary-color: #2980b9;
+            --primary-light: rgba(41, 128, 185, 0.2);
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #1a1a1a;
+            --text-color: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --special-run-color: #e67e22;
+            --card-bg: #2c2c2c;
+            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+            --next-bus-border: 3px solid var(--primary-color);
+            --special-bg: #4a3319;
+            --input-bg: #2c2c2c;
+            --input-border: #444;
+            --toggle-bg: #444;
+            --toggle-text: #ecf0f1;
+            --datetime-bg: rgba(41, 128, 185, 0.2);
+            --date-text: #ecf0f1;
+            --time-text: #3498db;
+            --holiday-badge: #e74c3c;
         }
         
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
         
         body {
@@ -35,36 +74,109 @@
         
         header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         
         .title-container {
-            margin-bottom: 5px;
+            margin-bottom: 15px;
         }
         
         h1 {
             color: var(--primary-color);
             font-size: 1.8rem;
+            font-weight: 700;
             margin-bottom: 5px;
         }
         
-        .datetime-display {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
+        .datetime-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .datetime-card {
+            background: var(--datetime-bg);
+            border-radius: 12px;
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .date-display {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--date-text);
+            margin-bottom: 4px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .time-display-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+        
+        .time-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .time-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--time-text);
+            text-align: center;
+            min-width: 40px;
+            line-height: 1.2;
+        }
+        
+        .time-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .time-separator {
+            font-size: 1.8rem;
+            color: var(--time-text);
+            opacity: 0.5;
+            margin: 0 2px;
+            line-height: 1.2;
+        }
+        
+        .day-type-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
         }
         
         .day-type-display {
             display: inline-block;
             padding: 3px 12px;
-            margin-bottom: 10px;
+            margin-top: 5px;
             border-radius: 15px;
-            font-weight: bold;
+            font-weight: 600;
             background-color: var(--primary-color);
             color: white;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         
         .day-type-display.weekend {
@@ -75,22 +187,35 @@
             background-color: var(--special-run-color);
         }
         
+        .holiday-name {
+            font-size: 0.85rem;
+            color: var(--holiday-badge);
+            font-weight: 600;
+            margin-top: 3px;
+        }
+        
         .tabs {
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
             flex-wrap: wrap;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .tab {
             padding: 10px 20px;
-            background-color: #ecf0f1;
+            background-color: var(--toggle-bg);
+            color: var(--toggle-text);
             border: none;
             cursor: pointer;
             margin: 3px;
             border-radius: 5px;
-            font-weight: bold;
+            font-weight: 600;
             transition: all 0.3s;
+            flex: 1;
+            text-align: center;
         }
         
         .tab.active {
@@ -98,26 +223,32 @@
             color: white;
         }
         
-        .language-toggle {
-            position: absolute;
-            top: 15px;
-            right: 15px;
+        .language-toggle, .theme-toggle {
             display: flex;
             align-items: center;
             gap: 5px;
         }
         
-        .language-toggle button {
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 15px;
+            margin-bottom: 15px;
+        }
+        
+        .language-toggle button, .theme-toggle button {
             padding: 5px 10px;
-            background-color: #ecf0f1;
+            background-color: var(--toggle-bg);
+            color: var(--toggle-text);
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             transition: all 0.3s;
         }
         
-        .language-toggle button.active {
+        .language-toggle button.active, .theme-toggle button.active {
             background-color: var(--primary-color);
             color: white;
         }
@@ -131,10 +262,12 @@
         
         .next-bus-card {
             background-color: var(--card-bg);
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 15px;
             box-shadow: var(--shadow);
             flex: 1 1 300px;
+            position: relative;
+            overflow: hidden;
         }
         
         .next-bus-card h3 {
@@ -143,11 +276,12 @@
             font-size: 1.2rem;
             border-bottom: 2px solid var(--light-bg);
             padding-bottom: 8px;
+            font-weight: 600;
         }
         
         .time-display {
-            font-size: 2rem;
-            font-weight: bold;
+            font-size: 2.2rem;
+            font-weight: 700;
             color: var(--text-color);
             margin: 12px 0;
             text-align: center;
@@ -161,6 +295,35 @@
             text-align: center;
             font-size: 1.1rem;
             margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .countdown-bar-container {
+            position: relative;
+            height: 8px;
+            width: 100%;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .countdown-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 1s linear;
+        }
+        
+        .countdown-marker {
+            position: absolute;
+            top: 50%;
+            width: 3px;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.7);
+            transform: translateY(-50%);
         }
         
         .special-notice {
@@ -176,12 +339,24 @@
             color: var(--primary-color);
             margin: 20px 0 12px;
             text-align: center;
-            font-weight: bold;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .section-title::before,
+        .section-title::after {
+            content: "";
+            height: 1px;
+            flex-grow: 1;
+            background-color: var(--primary-light);
+            margin: 0 15px;
         }
         
         .schedule-container {
             background-color: var(--card-bg);
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 15px;
             box-shadow: var(--shadow);
             margin-top: 15px;
@@ -194,12 +369,13 @@
             align-items: center;
             margin-bottom: 15px;
             flex-wrap: wrap;
+            gap: 10px;
         }
         
         .schedule-title {
             font-size: 1.2rem;
             color: var(--primary-color);
-            font-weight: bold;
+            font-weight: 600;
         }
         
         .controls {
@@ -208,12 +384,19 @@
             flex-wrap: wrap;
         }
         
-        select, button {
+        select, button, input {
             padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: white;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
             font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.8;
         }
         
         button {
@@ -222,10 +405,27 @@
             cursor: pointer;
             border: none;
             transition: background-color 0.3s;
+            font-weight: 600;
         }
         
         button:hover {
             background-color: var(--secondary-color);
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 0;
+            margin-right: 10px;
+        }
+        
+        .clear-search {
+            background-color: var(--accent-color);
         }
         
         .time-grid {
@@ -236,17 +436,32 @@
         }
         
         .time-cell {
-            padding: 8px;
+            padding: 10px 8px;
             text-align: center;
             background-color: var(--light-bg);
-            border-radius: 5px;
-            font-size: 0.9rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        
+        .time-cell:hover {
+            transform: translateY(-2px);
         }
         
         .time-cell.special {
-            background-color: #fef0e6;
+            background-color: var(--special-bg);
             color: var(--special-run-color);
-            font-weight: bold;
+            font-weight: 600;
+        }
+        
+        .time-cell.highlight {
+            animation: pulse 1s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { opacity: 1; }
+            to { opacity: 0.6; }
         }
         
         /* Fixed: Next bus now uses a border instead of changing the background */
@@ -298,7 +513,7 @@
         }
         
         .legend-color.special {
-            background-color: #fef0e6;
+            background-color: var(--special-bg);
         }
         
         /* Update the next bus legend to match the new style */
@@ -320,14 +535,27 @@
         }
         
         @media (max-width: 768px) {
-            .language-toggle {
-                position: static;
-                justify-content: center;
-                margin-bottom: 15px;
+            .top-controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .theme-toggle {
+                order: -1;
             }
             
             .title-container {
-                margin-top: 50px;
+                margin-top: 15px;
+            }
+            
+            .schedule-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .schedule-title {
+                margin-bottom: 10px;
             }
         }
         
@@ -343,22 +571,67 @@
             .time-grid {
                 grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
             }
+            
+            .search-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-input {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .time-display-container {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="language-toggle">
-            <button id="en-toggle" class="active">English</button>
-            <button id="zh-toggle">中文</button>
+        <div class="top-controls">
+            <div class="language-toggle">
+                <button id="en-toggle" class="active">English</button>
+                <button id="zh-toggle">中文</button>
+            </div>
+            
+            <div class="theme-toggle">
+                <button id="light-toggle" class="active" data-en="Light" data-zh="淺色">Light</button>
+                <button id="dark-toggle" data-en="Dark" data-zh="深色">Dark</button>
+            </div>
         </div>
         
         <div class="title-container">
             <h1 data-en="Villa Rhapsody Bus Schedule" data-zh="凱琴居巴士時間表">Villa Rhapsody Bus Schedule</h1>
         </div>
         
-        <div class="datetime-display" id="current-datetime"></div>
-        <div class="day-type-display" id="day-type">Weekday</div>
+        <div class="datetime-container">
+            <div class="datetime-card">
+                <div class="date-display" id="current-date"></div>
+                <div class="time-display-container" id="current-time">
+                    <div class="time-unit">
+                        <div class="time-value" id="hours">00</div>
+                        <div class="time-label" data-en="Hours" data-zh="時">Hours</div>
+                    </div>
+                    <div class="time-separator">:</div>
+                    <div class="time-unit">
+                        <div class="time-value" id="minutes">00</div>
+                        <div class="time-label" data-en="Minutes" data-zh="分">Minutes</div>
+                    </div>
+                    <div class="time-separator">:</div>
+                    <div class="time-unit">
+                        <div class="time-value" id="seconds">00</div>
+                        <div class="time-label" data-en="Seconds" data-zh="秒">Seconds</div>
+                    </div>
+                </div>
+                <div class="day-type-container">
+                    <div class="day-type-display" id="day-type">Weekday</div>
+                    <div class="holiday-name hidden" id="holiday-name"></div>
+                </div>
+            </div>
+        </div>
     </header>
     
     <div class="tabs">
@@ -373,6 +646,9 @@
                 <h3 data-en="From New Town Plaza to Villa Rhapsody" data-zh="由沙田新城市廣場往凱琴居">From New Town Plaza to Villa Rhapsody</h3>
                 <div class="time-display" id="next-ntp-to-vr">--:--</div>
                 <div class="countdown" id="countdown-ntp-to-vr">Loading...</div>
+                <div class="countdown-bar-container">
+                    <div class="countdown-bar" id="progress-ntp-to-vr"></div>
+                </div>
                 <div class="special-notice" id="special-notice-ntp-to-vr"></div>
             </div>
             
@@ -380,6 +656,9 @@
                 <h3 data-en="From Villa Rhapsody to New Town Plaza" data-zh="由凱琴居往沙田新城市廣場">From Villa Rhapsody to New Town Plaza</h3>
                 <div class="time-display" id="next-vr-to-ntp">--:--</div>
                 <div class="countdown" id="countdown-vr-to-ntp">Loading...</div>
+                <div class="countdown-bar-container">
+                    <div class="countdown-bar" id="progress-vr-to-ntp"></div>
+                </div>
                 <div class="special-notice" id="special-notice-vr-to-ntp"></div>
             </div>
         </div>
@@ -390,6 +669,9 @@
                 <h3 data-en="From Sunshine City to Villa Rhapsody" data-zh="由馬鞍山新港城往凱琴居">From Sunshine City to Villa Rhapsody</h3>
                 <div class="time-display" id="next-sc-to-vr">--:--</div>
                 <div class="countdown" id="countdown-sc-to-vr">Loading...</div>
+                <div class="countdown-bar-container">
+                    <div class="countdown-bar" id="progress-sc-to-vr"></div>
+                </div>
                 <div class="special-notice" id="special-notice-sc-to-vr"></div>
             </div>
             
@@ -397,6 +679,9 @@
                 <h3 data-en="From Villa Rhapsody to Sunshine City" data-zh="由凱琴居往馬鞍山新港城">From Villa Rhapsody to Sunshine City</h3>
                 <div class="time-display" id="next-vr-to-sc">--:--</div>
                 <div class="countdown" id="countdown-vr-to-sc">Loading...</div>
+                <div class="countdown-bar-container">
+                    <div class="countdown-bar" id="progress-vr-to-sc"></div>
+                </div>
                 <div class="special-notice" id="special-notice-vr-to-sc"></div>
             </div>
         </div>
@@ -418,6 +703,11 @@
                         <option value="weekend" data-en="Saturday, Sunday & Public Holiday" data-zh="星期六/日及公眾假期">Saturday, Sunday & Public Holiday</option>
                     </select>
                 </div>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="time-search" class="search-input" placeholder="Search time (e.g. 08:30)" data-placeholder-en="Search time (e.g. 08:30)" data-placeholder-zh="搜尋時間 (例如 08:30)">
+                <button id="clear-search" class="clear-search" data-en="Clear" data-zh="清除">Clear</button>
             </div>
             
             <div class="time-grid" id="time-grid">
@@ -442,6 +732,67 @@
     </div>
 
     <script>
+        // Performance optimization: Store DOM references outside functions
+        const DOM = {
+            // Tabs and view elements
+            tabCurrent: document.getElementById('tab-current'),
+            tabSchedule: document.getElementById('tab-schedule'),
+            currentView: document.getElementById('current-view'),
+            scheduleView: document.getElementById('schedule-view'),
+            
+            // Route and day controls
+            routeSelect: document.getElementById('route-select'),
+            daySelect: document.getElementById('day-select'),
+            timeGrid: document.getElementById('time-grid'),
+            scheduleTitle: document.getElementById('schedule-title'),
+            
+            // Search elements
+            timeSearch: document.getElementById('time-search'),
+            clearSearch: document.getElementById('clear-search'),
+            
+            // Next bus elements - Main Route
+            nextNTPtoVR: {
+                time: document.getElementById('next-ntp-to-vr'),
+                countdown: document.getElementById('countdown-ntp-to-vr'),
+                progress: document.getElementById('progress-ntp-to-vr'),
+                notice: document.getElementById('special-notice-ntp-to-vr')
+            },
+            nextVRtoNTP: {
+                time: document.getElementById('next-vr-to-ntp'),
+                countdown: document.getElementById('countdown-vr-to-ntp'),
+                progress: document.getElementById('progress-vr-to-ntp'),
+                notice: document.getElementById('special-notice-vr-to-ntp')
+            },
+            
+            // Next bus elements - Short Route
+            nextSCtoVR: {
+                time: document.getElementById('next-sc-to-vr'),
+                countdown: document.getElementById('countdown-sc-to-vr'),
+                progress: document.getElementById('progress-sc-to-vr'),
+                notice: document.getElementById('special-notice-sc-to-vr')
+            },
+            nextVRtoSC: {
+                time: document.getElementById('next-vr-to-sc'),
+                countdown: document.getElementById('countdown-vr-to-sc'),
+                progress: document.getElementById('progress-vr-to-sc'),
+                notice: document.getElementById('special-notice-vr-to-sc')
+            },
+            
+            // Theme and language toggles
+            enToggle: document.getElementById('en-toggle'),
+            zhToggle: document.getElementById('zh-toggle'),
+            lightToggle: document.getElementById('light-toggle'),
+            darkToggle: document.getElementById('dark-toggle'),
+            
+            // Date and time display
+            currentDate: document.getElementById('current-date'),
+            hoursEl: document.getElementById('hours'),
+            minutesEl: document.getElementById('minutes'),
+            secondsEl: document.getElementById('seconds'),
+            dayType: document.getElementById('day-type'),
+            holidayName: document.getElementById('holiday-name')
+        };
+
         // Bus schedule data
         const busSchedules = {
             // MAIN ROUTE
@@ -904,23 +1255,23 @@
         // Public holidays in Hong Kong for 2025
         const publicHolidays = [
             // Standard holidays
-            "2025-01-01", // New Year's Day
-            "2025-01-29", // Lunar New Year's Day
-            "2025-01-30", // 2nd day of Lunar New Year
-            "2025-01-31", // 3rd day of Lunar New Year
-            "2025-04-04", // Ching Ming Festival
-            "2025-04-18", // Good Friday
-            "2025-04-19", // Day after Good Friday
-            "2025-04-21", // Easter Monday
-            "2025-05-01", // Labor Day
-            "2025-05-05", // Buddha's Birthday
-            "2025-05-31", // Tuen Ng Festival
-            "2025-07-01", // HKSAR Establishment Day
-            "2025-10-01", // National Day
-            "2025-10-07", // Day after Mid-Autumn Festival
-            "2025-10-29", // Chung Yeung Festival
-            "2025-12-25", // Christmas Day
-            "2025-12-26"  // Day after Christmas Day
+            {date: "2025-01-01", name: "New Year's Day", nameZh: "新年"},
+            {date: "2025-01-29", name: "Lunar New Year's Day", nameZh: "農曆新年"},
+            {date: "2025-01-30", name: "2nd day of Lunar New Year", nameZh: "農曆新年初二"},
+            {date: "2025-01-31", name: "3rd day of Lunar New Year", nameZh: "農曆新年初三"},
+            {date: "2025-04-04", name: "Ching Ming Festival", nameZh: "清明節"},
+            {date: "2025-04-18", name: "Good Friday", nameZh: "耶穌受難節"},
+            {date: "2025-04-19", name: "Day after Good Friday", nameZh: "耶穌受難節翌日"},
+            {date: "2025-04-21", name: "Easter Monday", nameZh: "復活節星期一"},
+            {date: "2025-05-01", name: "Labor Day", nameZh: "勞動節"},
+            {date: "2025-05-05", name: "Buddha's Birthday", nameZh: "佛誕"},
+            {date: "2025-05-31", name: "Tuen Ng Festival", nameZh: "端午節"},
+            {date: "2025-07-01", name: "HKSAR Establishment Day", nameZh: "香港特別行政區成立紀念日"},
+            {date: "2025-10-01", name: "National Day", nameZh: "國慶日"},
+            {date: "2025-10-07", name: "Day after Mid-Autumn Festival", nameZh: "中秋節翌日"},
+            {date: "2025-10-29", name: "Chung Yeung Festival", nameZh: "重陽節"},
+            {date: "2025-12-25", name: "Christmas Day", nameZh: "聖誕節"},
+            {date: "2025-12-26", name: "Day after Christmas Day", nameZh: "聖誕節翌日"}
         ];
 
         // Route descriptions for special runs
@@ -955,106 +1306,135 @@
             }
         };
 
-        // DOM elements
-        const currentDatetimeDisplay = document.getElementById('current-datetime');
-        const dayTypeDisplay = document.getElementById('day-type');
+        // App state
+        let state = {
+            currentLang: 'en',
+            theme: 'light',
+            searchTerm: '',
+            lastUpdateTime: 0,
+            nextBusCache: {},
+            viewMode: 'current'
+        };
         
-        const tabCurrent = document.getElementById('tab-current');
-        const tabSchedule = document.getElementById('tab-schedule');
-        const currentView = document.getElementById('current-view');
-        const scheduleView = document.getElementById('schedule-view');
-        const routeSelect = document.getElementById('route-select');
-        const daySelect = document.getElementById('day-select');
-        const timeGrid = document.getElementById('time-grid');
-        const scheduleTitle = document.getElementById('schedule-title');
-        
-        // Next bus display elements - Main Route
-        const nextVRtoNTP = document.getElementById('next-vr-to-ntp');
-        const countdownVRtoNTP = document.getElementById('countdown-vr-to-ntp');
-        const specialNoticeVRtoNTP = document.getElementById('special-notice-vr-to-ntp');
-        
-        const nextNTPtoVR = document.getElementById('next-ntp-to-vr');
-        const countdownNTPtoVR = document.getElementById('countdown-ntp-to-vr');
-        const specialNoticeNTPtoVR = document.getElementById('special-notice-ntp-to-vr');
-        
-        // Next bus display elements - Short Route
-        const nextVRtoSC = document.getElementById('next-vr-to-sc');
-        const countdownVRtoSC = document.getElementById('countdown-vr-to-sc');
-        const specialNoticeVRtoSC = document.getElementById('special-notice-vr-to-sc');
-        
-        const nextSCtoVR = document.getElementById('next-sc-to-vr');
-        const countdownSCtoVR = document.getElementById('countdown-sc-to-vr');
-        const specialNoticeSCtoVR = document.getElementById('special-notice-sc-to-vr');
-
-        // Language toggle elements
-        const enToggle = document.getElementById('en-toggle');
-        const zhToggle = document.getElementById('zh-toggle');
-        let currentLang = 'en';
+        // Performance optimization: Use requestAnimationFrame for visual updates
+        let animationFrameId = null;
         
         // Switch between tabs
-        tabCurrent.addEventListener('click', () => {
-            tabCurrent.classList.add('active');
-            tabSchedule.classList.remove('active');
-            currentView.classList.remove('hidden');
-            scheduleView.classList.add('hidden');
+        DOM.tabCurrent.addEventListener('click', () => {
+            if (state.viewMode !== 'current') {
+                DOM.tabCurrent.classList.add('active');
+                DOM.tabSchedule.classList.remove('active');
+                DOM.currentView.classList.remove('hidden');
+                DOM.scheduleView.classList.add('hidden');
+                state.viewMode = 'current';
+                
+                // Update next buses when switching to current view
+                updateNextBuses();
+            }
         });
         
-        tabSchedule.addEventListener('click', () => {
-            tabSchedule.classList.add('active');
-            tabCurrent.classList.remove('active');
-            scheduleView.classList.remove('hidden');
-            currentView.classList.add('hidden');
-            renderSchedule();
+        DOM.tabSchedule.addEventListener('click', () => {
+            if (state.viewMode !== 'schedule') {
+                DOM.tabSchedule.classList.add('active');
+                DOM.tabCurrent.classList.remove('active');
+                DOM.scheduleView.classList.remove('hidden');
+                DOM.currentView.classList.add('hidden');
+                state.viewMode = 'schedule';
+                
+                renderSchedule();
+            }
         });
         
         // Event listeners for schedule controls
-        routeSelect.addEventListener('change', renderSchedule);
-        daySelect.addEventListener('change', renderSchedule);
+        DOM.routeSelect.addEventListener('change', renderSchedule);
+        DOM.daySelect.addEventListener('change', renderSchedule);
+        
+        // Event listeners for search
+        DOM.timeSearch.addEventListener('input', (e) => {
+            state.searchTerm = e.target.value.trim();
+            renderSchedule();
+        });
+        
+        DOM.clearSearch.addEventListener('click', () => {
+            state.searchTerm = '';
+            DOM.timeSearch.value = '';
+            renderSchedule();
+        });
         
         // Language toggle
-        enToggle.addEventListener('click', () => {
-            if (currentLang !== 'en') {
-                currentLang = 'en';
-                enToggle.classList.add('active');
-                zhToggle.classList.remove('active');
+        DOM.enToggle.addEventListener('click', () => {
+            if (state.currentLang !== 'en') {
+                state.currentLang = 'en';
+                DOM.enToggle.classList.add('active');
+                DOM.zhToggle.classList.remove('active');
                 updateLanguage();
                 updateDatetimeDisplay(); // Update date/time display with new language
             }
         });
         
-        zhToggle.addEventListener('click', () => {
-            if (currentLang !== 'zh') {
-                currentLang = 'zh';
-                zhToggle.classList.add('active');
-                enToggle.classList.remove('active');
+        DOM.zhToggle.addEventListener('click', () => {
+            if (state.currentLang !== 'zh') {
+                state.currentLang = 'zh';
+                DOM.zhToggle.classList.add('active');
+                DOM.enToggle.classList.remove('active');
                 updateLanguage();
                 updateDatetimeDisplay(); // Update date/time display with new language
             }
         });
+        
+        // Theme toggle
+        DOM.lightToggle.addEventListener('click', () => {
+            if (state.theme !== 'light') {
+                state.theme = 'light';
+                document.documentElement.setAttribute('data-theme', 'light');
+                DOM.lightToggle.classList.add('active');
+                DOM.darkToggle.classList.remove('active');
+            }
+        });
+        
+        DOM.darkToggle.addEventListener('click', () => {
+            if (state.theme !== 'dark') {
+                state.theme = 'dark';
+                document.documentElement.setAttribute('data-theme', 'dark');
+                DOM.darkToggle.classList.add('active');
+                DOM.lightToggle.classList.remove('active');
+            }
+        });
+        
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            DOM.darkToggle.click();
+        }
         
         // Function to update the language
         function updateLanguage() {
             const elements = document.querySelectorAll('[data-en]');
             elements.forEach(el => {
-                el.textContent = el.getAttribute(`data-${currentLang}`);
+                el.textContent = el.getAttribute(`data-${state.currentLang}`);
+            });
+            
+            // Update placeholders
+            const placeholders = document.querySelectorAll('[data-placeholder-en]');
+            placeholders.forEach(el => {
+                el.placeholder = el.getAttribute(`data-placeholder-${state.currentLang}`);
             });
             
             // Update the route and day select options
-            const routeOptions = routeSelect.querySelectorAll('option');
+            const routeOptions = DOM.routeSelect.querySelectorAll('option');
             routeOptions.forEach(option => {
-                option.textContent = option.getAttribute(`data-${currentLang}`);
+                option.textContent = option.getAttribute(`data-${state.currentLang}`);
             });
             
-            const dayOptions = daySelect.querySelectorAll('option');
+            const dayOptions = DOM.daySelect.querySelectorAll('option');
             dayOptions.forEach(option => {
-                option.textContent = option.getAttribute(`data-${currentLang}`);
+                option.textContent = option.getAttribute(`data-${state.currentLang}`);
             });
             
             // Update the special notices
             updateNextBuses();
             
             // Update the schedule title if in schedule view
-            if (!scheduleView.classList.contains('hidden')) {
+            if (state.viewMode === 'schedule') {
                 renderSchedule();
             }
             
@@ -1062,61 +1442,80 @@
             updateDayTypeDisplay();
         }
         
-        // Function to format date and time based on language
-        function formatDatetime(date, lang) {
+        // Function to format date based on language
+        function formatDate(date, lang) {
             if (lang === 'en') {
-                const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-                const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-                
-                const formattedDate = date.toLocaleDateString('en-US', dateOptions);
-                const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
-                
-                return `${formattedDate}, ${formattedTime}`;
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
             } else {
                 const year = date.getFullYear();
                 const month = date.getMonth() + 1;
                 const day = date.getDate();
                 const weekday = ['日', '一', '二', '三', '四', '五', '六'][date.getDay()];
                 
-                let hours = date.getHours();
-                const minutes = date.getMinutes().toString().padStart(2, '0');
-                const seconds = date.getSeconds().toString().padStart(2, '0');
-                
-                const ampm = hours < 12 ? '上午' : '下午';
-                hours = hours % 12;
-                hours = hours ? hours : 12; // Convert 0 to 12
-                
-                return `${year}年${month}月${day}日 (星期${weekday}) ${ampm}${hours}:${minutes}:${seconds}`;
+                return `${year}年${month}月${day}日 星期${weekday}`;
             }
         }
         
-        // Function to update the date and time display
+        // Function to check if a date is a public holiday and get its name
+        function getHolidayInfo(date) {
+            const dateString = date.toISOString().slice(0, 10); // Format as YYYY-MM-DD
+            const holiday = publicHolidays.find(h => h.date === dateString);
+            
+            if (holiday) {
+                return {
+                    isHoliday: true,
+                    name: state.currentLang === 'en' ? holiday.name : holiday.nameZh
+                };
+            }
+            
+            return { isHoliday: false, name: '' };
+        }
+        
+        // Function to update the date and time display (fixed to update every second)
         function updateDatetimeDisplay() {
             const now = new Date();
-            currentDatetimeDisplay.textContent = formatDatetime(now, currentLang);
+            
+            // Update date
+            DOM.currentDate.textContent = formatDate(now, state.currentLang);
+            
+            // Update time - this now properly updates seconds
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            
+            DOM.hoursEl.textContent = hours;
+            DOM.minutesEl.textContent = minutes;
+            DOM.secondsEl.textContent = seconds;
+            
+            // Update day type
             updateDayTypeDisplay();
         }
         
         // Function to update the day type display
         function updateDayTypeDisplay() {
+            const now = new Date();
             const dayType = getDayType();
             
             // Update the text
-            dayTypeDisplay.textContent = dayTypeText[currentLang][dayType];
+            DOM.dayType.textContent = dayTypeText[state.currentLang][dayType];
             
             // Update the class
-            dayTypeDisplay.className = 'day-type-display';
+            DOM.dayType.className = 'day-type-display';
             if (dayType === 'saturday') {
-                dayTypeDisplay.classList.add('weekend');
+                DOM.dayType.classList.add('weekend');
             } else if (dayType === 'sunday' || dayType === 'holiday') {
-                dayTypeDisplay.classList.add('holiday');
+                DOM.dayType.classList.add('holiday');
             }
-        }
-        
-        // Function to check if a date is a public holiday
-        function isPublicHoliday(date) {
-            const dateString = date.toISOString().slice(0, 10); // Format as YYYY-MM-DD
-            return publicHolidays.includes(dateString);
+            
+            // Show holiday name if applicable
+            const holidayInfo = getHolidayInfo(now);
+            if (holidayInfo.isHoliday) {
+                DOM.holidayName.textContent = holidayInfo.name;
+                DOM.holidayName.classList.remove('hidden');
+            } else {
+                DOM.holidayName.classList.add('hidden');
+            }
         }
         
         // Function to get the day type (weekday, saturday, sunday, or holiday)
@@ -1124,7 +1523,8 @@
             const now = new Date();
             const day = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
             
-            if (isPublicHoliday(now)) {
+            const holidayInfo = getHolidayInfo(now);
+            if (holidayInfo.isHoliday) {
                 return 'holiday';
             }
             
@@ -1143,37 +1543,92 @@
             return dayType === 'weekday'; // Only return true for regular weekdays
         }
         
-        // Function to get the next bus time
-        function getNextBus(routeKey) {
+        // Helper function to convert time string to minutes
+        function timeToMinutes(timeString) {
+            const [hours, minutes] = timeString.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+        
+        // Function to get both next and previous buses
+        function getBusTimings(routeKey) {
             const now = new Date();
             const dayType = isWeekdaySchedule() ? "weekday" : "weekend";
             const schedule = busSchedules[routeKey][dayType];
             
             const currentHours = now.getHours();
             const currentMinutes = now.getMinutes();
-            const currentSeconds = now.getSeconds();
+            const currentSeconds = now.getSeconds();  // Include seconds for more precise calculations
             const currentTimeInMinutes = currentHours * 60 + currentMinutes + (currentSeconds / 60);
             
+            let nextBusIndex = -1;
+            let prevBusIndex = -1;
+            
             // Find the next bus
-            for (const bus of schedule) {
-                const [hours, minutes] = bus.time.split(':').map(Number);
-                const busTimeInMinutes = hours * 60 + minutes;
+            for (let i = 0; i < schedule.length; i++) {
+                const busTimeInMinutes = timeToMinutes(schedule[i].time);
                 
                 if (busTimeInMinutes > currentTimeInMinutes) {
-                    return {
-                        time: bus.time,
-                        special: bus.special,
-                        minutesUntil: busTimeInMinutes - currentTimeInMinutes
-                    };
+                    nextBusIndex = i;
+                    prevBusIndex = i > 0 ? i - 1 : schedule.length - 1; // Previous bus or last bus from yesterday
+                    break;
                 }
             }
             
-            // If no bus found today, return the first bus of the next day
+            // If no next bus found today, it's the first bus tomorrow
+            if (nextBusIndex === -1) {
+                nextBusIndex = 0; // First bus tomorrow
+                prevBusIndex = schedule.length - 1; // Last bus today
+            }
+            
+            const nextBus = schedule[nextBusIndex];
+            const prevBus = schedule[prevBusIndex];
+            
+            // Calculate time until next bus
+            const nextBusTimeInMinutes = timeToMinutes(nextBus.time);
+            let minutesUntil;
+            let isTomorrow = false;
+            
+            if (nextBusTimeInMinutes > currentTimeInMinutes) {
+                // Next bus is later today
+                minutesUntil = nextBusTimeInMinutes - currentTimeInMinutes;
+            } else {
+                // Next bus is tomorrow
+                minutesUntil = (24 * 60 - currentTimeInMinutes) + nextBusTimeInMinutes;
+                isTomorrow = true;
+            }
+            
+            // Calculate progress between buses
+            const prevBusTimeInMinutes = timeToMinutes(prevBus.time);
+            let totalInterval;
+            let elapsed;
+            
+            if (prevBusTimeInMinutes < nextBusTimeInMinutes && !isTomorrow) {
+                // Normal case: prev bus was earlier today, next bus is later today
+                totalInterval = nextBusTimeInMinutes - prevBusTimeInMinutes;
+                elapsed = currentTimeInMinutes - prevBusTimeInMinutes;
+            } else if (isTomorrow) {
+                // Next bus is tomorrow
+                totalInterval = (24 * 60 - prevBusTimeInMinutes) + nextBusTimeInMinutes;
+                elapsed = currentTimeInMinutes - prevBusTimeInMinutes;
+                if (elapsed < 0) {
+                    // If elapsed is negative, previous bus was yesterday
+                    elapsed += 24 * 60;
+                }
+            } else {
+                // Previous bus was yesterday (unlikely case)
+                totalInterval = nextBusTimeInMinutes + (24 * 60 - prevBusTimeInMinutes);
+                elapsed = currentTimeInMinutes + (24 * 60 - prevBusTimeInMinutes);
+            }
+            
+            // Ensure progress is between 0 and 100%
+            const progressPercent = Math.min(100, Math.max(0, (elapsed / totalInterval) * 100));
+            
             return {
-                time: schedule[0].time,
-                special: schedule[0].special,
-                minutesUntil: (24 * 60 - currentTimeInMinutes) + (parseInt(schedule[0].time.split(':')[0]) * 60 + parseInt(schedule[0].time.split(':')[1])),
-                tomorrow: true
+                next: nextBus,
+                prev: prevBus,
+                minutesUntil: minutesUntil,
+                progressPercent: progressPercent,
+                tomorrow: isTomorrow
             };
         }
         
@@ -1191,109 +1646,84 @@
             }
         }
         
-        // Function to update the next bus information
+        // Function to update a single next bus display with accurate progress bar
+        function updateNextBusDisplay(routeKey, elements, specialDescriptions) {
+            const busTimings = getBusTimings(routeKey);
+            const nextBus = busTimings.next;
+            
+            // Update the time
+            elements.time.textContent = nextBus.time;
+            if (nextBus.special) {
+                elements.time.classList.add('special');
+                elements.notice.textContent = state.currentLang === 'en' ? 
+                    "Special Run - " + specialDescriptions.en[routeKey] :
+                    "特別班次 - " + specialDescriptions.zh[routeKey];
+            } else {
+                elements.time.classList.remove('special');
+                elements.notice.textContent = "";
+            }
+            
+            // Update the countdown text
+            const countdownText = busTimings.tomorrow 
+                ? (state.currentLang === 'en' ? 
+                   `Arriving tomorrow in ${formatMinutes(busTimings.minutesUntil)}` :
+                   `明天到達，還剩 ${formatMinutes(busTimings.minutesUntil)}`)
+                : (state.currentLang === 'en' ? 
+                   `Arriving in ${formatMinutes(busTimings.minutesUntil)}` :
+                   `到達時間剩餘 ${formatMinutes(busTimings.minutesUntil)}`);
+            elements.countdown.textContent = countdownText;
+            
+            // Update the progress bar - now accurately representing progress between buses
+            elements.progress.style.width = busTimings.progressPercent + '%';
+            
+            return nextBus;
+        }
+        
+        // Function to update all next bus information
         function updateNextBuses() {
-            // Main Route: New Town Plaza to Villa Rhapsody
-            const nextBusNTPtoVR = getNextBus('ntp-to-vr');
-            nextNTPtoVR.textContent = nextBusNTPtoVR.time;
-            if (nextBusNTPtoVR.special) {
-                nextNTPtoVR.classList.add('special');
-                specialNoticeNTPtoVR.textContent = currentLang === 'en' ? 
-                    "Special Run - " + specialRunDescriptions.en['ntp-to-vr'] :
-                    "特別班次 - " + specialRunDescriptions.zh['ntp-to-vr'];
-            } else {
-                nextNTPtoVR.classList.remove('special');
-                specialNoticeNTPtoVR.textContent = "";
+            // Make this less restrictive - it now updates every second
+            const now = Date.now();
+            state.lastUpdateTime = now;
+            
+            if (state.viewMode !== 'current') {
+                return; // Don't update when not in the current view
             }
             
-            const ntpVrCountdownText = nextBusNTPtoVR.tomorrow 
-                ? (currentLang === 'en' ? 
-                   `Arriving tomorrow in ${formatMinutes(nextBusNTPtoVR.minutesUntil)}` :
-                   `明天到達，還剩 ${formatMinutes(nextBusNTPtoVR.minutesUntil)}`)
-                : (currentLang === 'en' ? 
-                   `Arriving in ${formatMinutes(nextBusNTPtoVR.minutesUntil)}` :
-                   `到達時間剩餘 ${formatMinutes(nextBusNTPtoVR.minutesUntil)}`);
-            countdownNTPtoVR.textContent = ntpVrCountdownText;
+            // Update each route
+            updateNextBusDisplay('ntp-to-vr', DOM.nextNTPtoVR, specialRunDescriptions);
+            updateNextBusDisplay('vr-to-ntp', DOM.nextVRtoNTP, specialRunDescriptions);
+            updateNextBusDisplay('sc-to-vr', DOM.nextSCtoVR, specialRunDescriptions);
+            updateNextBusDisplay('vr-to-sc', DOM.nextVRtoSC, specialRunDescriptions);
+        }
+        
+        // Function to filter times based on search
+        function filterTimes(times, searchTerm) {
+            if (!searchTerm) return times;
             
-            // Main Route: Villa Rhapsody to New Town Plaza
-            const nextBusVRtoNTP = getNextBus('vr-to-ntp');
-            nextVRtoNTP.textContent = nextBusVRtoNTP.time;
-            if (nextBusVRtoNTP.special) {
-                nextVRtoNTP.classList.add('special');
-                specialNoticeVRtoNTP.textContent = currentLang === 'en' ? 
-                    "Special Run - " + specialRunDescriptions.en['vr-to-ntp'] :
-                    "特別班次 - " + specialRunDescriptions.zh['vr-to-ntp'];
-            } else {
-                nextVRtoNTP.classList.remove('special');
-                specialNoticeVRtoNTP.textContent = "";
-            }
-            
-            const vrNtpCountdownText = nextBusVRtoNTP.tomorrow 
-                ? (currentLang === 'en' ? 
-                   `Arriving tomorrow in ${formatMinutes(nextBusVRtoNTP.minutesUntil)}` :
-                   `明天到達，還剩 ${formatMinutes(nextBusVRtoNTP.minutesUntil)}`)
-                : (currentLang === 'en' ? 
-                   `Arriving in ${formatMinutes(nextBusVRtoNTP.minutesUntil)}` :
-                   `到達時間剩餘 ${formatMinutes(nextBusVRtoNTP.minutesUntil)}`);
-            countdownVRtoNTP.textContent = vrNtpCountdownText;
-            
-            // Short Route: Sunshine City to Villa Rhapsody
-            const nextBusSCtoVR = getNextBus('sc-to-vr');
-            nextSCtoVR.textContent = nextBusSCtoVR.time;
-            if (nextBusSCtoVR.special) {
-                nextSCtoVR.classList.add('special');
-                specialNoticeSCtoVR.textContent = currentLang === 'en' ? 
-                    "Special Run - " + specialRunDescriptions.en['sc-to-vr'] :
-                    "特別班次 - " + specialRunDescriptions.zh['sc-to-vr'];
-            } else {
-                nextSCtoVR.classList.remove('special');
-                specialNoticeSCtoVR.textContent = "";
-            }
-            
-            const scVrCountdownText = nextBusSCtoVR.tomorrow 
-                ? (currentLang === 'en' ? 
-                   `Arriving tomorrow in ${formatMinutes(nextBusSCtoVR.minutesUntil)}` :
-                   `明天到達，還剩 ${formatMinutes(nextBusSCtoVR.minutesUntil)}`)
-                : (currentLang === 'en' ? 
-                   `Arriving in ${formatMinutes(nextBusSCtoVR.minutesUntil)}` :
-                   `到達時間剩餘 ${formatMinutes(nextBusSCtoVR.minutesUntil)}`);
-            countdownSCtoVR.textContent = scVrCountdownText;
-            
-            // Short Route: Villa Rhapsody to Sunshine City
-            const nextBusVRtoSC = getNextBus('vr-to-sc');
-            nextVRtoSC.textContent = nextBusVRtoSC.time;
-            if (nextBusVRtoSC.special) {
-                nextVRtoSC.classList.add('special');
-                specialNoticeVRtoSC.textContent = currentLang === 'en' ? 
-                    "Special Run - " + specialRunDescriptions.en['vr-to-sc'] :
-                    "特別班次 - " + specialRunDescriptions.zh['vr-to-sc'];
-            } else {
-                nextVRtoSC.classList.remove('special');
-                specialNoticeVRtoSC.textContent = "";
-            }
-            
-            const vrScCountdownText = nextBusVRtoSC.tomorrow 
-                ? (currentLang === 'en' ? 
-                   `Arriving tomorrow in ${formatMinutes(nextBusVRtoSC.minutesUntil)}` :
-                   `明天到達，還剩 ${formatMinutes(nextBusVRtoSC.minutesUntil)}`)
-                : (currentLang === 'en' ? 
-                   `Arriving in ${formatMinutes(nextBusVRtoSC.minutesUntil)}` :
-                   `到達時間剩餘 ${formatMinutes(nextBusVRtoSC.minutesUntil)}`);
-            countdownVRtoSC.textContent = vrScCountdownText;
+            return times.filter(bus => {
+                return bus.time.includes(searchTerm);
+            });
         }
         
         // Function to render the schedule
         function renderSchedule() {
-            const routeKey = routeSelect.value;
-            const dayType = daySelect.value;
+            if (state.viewMode !== 'schedule') {
+                return; // Don't render when not in schedule view
+            }
+            
+            const routeKey = DOM.routeSelect.value;
+            const dayType = DOM.daySelect.value;
             const schedule = busSchedules[routeKey][dayType];
             
             // Update the title based on the selected route
-            let titleText = routeSelect.options[routeSelect.selectedIndex].textContent;
-            scheduleTitle.textContent = titleText;
+            let titleText = DOM.routeSelect.options[DOM.routeSelect.selectedIndex].textContent;
+            DOM.scheduleTitle.textContent = titleText;
+            
+            // Filter based on search term
+            const filteredSchedule = filterTimes(schedule, state.searchTerm);
             
             // Clear the grid
-            timeGrid.innerHTML = '';
+            DOM.timeGrid.innerHTML = '';
             
             // Get the next bus for highlighting
             const now = new Date();
@@ -1301,12 +1731,15 @@
             let nextBusTime = null;
             
             if (currentDayType === dayType) {
-                const nextBus = getNextBus(routeKey);
-                nextBusTime = nextBus.time;
+                const busTimings = getBusTimings(routeKey);
+                nextBusTime = busTimings.next.time;
             }
             
+            // Create a document fragment for better performance
+            const fragment = document.createDocumentFragment();
+            
             // Add each time to the grid
-            schedule.forEach(bus => {
+            filteredSchedule.forEach(bus => {
                 const timeCell = document.createElement('div');
                 timeCell.textContent = bus.time;
                 timeCell.classList.add('time-cell');
@@ -1319,31 +1752,92 @@
                     timeCell.classList.add('next');
                 }
                 
-                timeGrid.appendChild(timeCell);
+                // Highlight search results
+                if (state.searchTerm && bus.time.includes(state.searchTerm)) {
+                    timeCell.classList.add('highlight');
+                }
+                
+                fragment.appendChild(timeCell);
             });
+            
+            // Append all at once for better performance
+            DOM.timeGrid.appendChild(fragment);
+        }
+        
+        // Function to update UI elements periodically
+        function updateUI() {
+            // Cancel any existing animation frame
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            
+            updateDatetimeDisplay();
+            updateNextBuses();
+            
+            // If in schedule view, update the highlighted next bus 
+            // only occasionally for performance reasons
+            if (state.viewMode === 'schedule' && Math.random() < 0.1) {  // 10% chance to update
+                renderSchedule();
+            }
+            
+            // Schedule the next update
+            animationFrameId = requestAnimationFrame(() => {
+                setTimeout(updateUI, 1000);
+            });
+        }
+        
+        // Function to save user preferences
+        function savePreferences() {
+            try {
+                localStorage.setItem('busSchedulePrefs', JSON.stringify({
+                    language: state.currentLang,
+                    theme: state.theme
+                }));
+            } catch (e) {
+                console.log('Could not save preferences:', e);
+            }
+        }
+        
+        // Function to load user preferences
+        function loadPreferences() {
+            try {
+                const prefs = JSON.parse(localStorage.getItem('busSchedulePrefs'));
+                if (prefs) {
+                    // Apply language
+                    if (prefs.language === 'zh') {
+                        DOM.zhToggle.click();
+                    } else {
+                        DOM.enToggle.click();
+                    }
+                    
+                    // Apply theme
+                    if (prefs.theme === 'dark') {
+                        DOM.darkToggle.click();
+                    } else {
+                        DOM.lightToggle.click();
+                    }
+                }
+            } catch (e) {
+                console.log('Could not load preferences:', e);
+            }
         }
         
         // Initialize the app
         function init() {
-            updateDatetimeDisplay();
-            updateNextBuses();
+            // Load user preferences
+            loadPreferences();
             
-            // Update time every second
-            setInterval(() => {
-                updateDatetimeDisplay();
-                updateNextBuses();
-                
-                // If in schedule view, update the highlighted next bus
-                if (!scheduleView.classList.contains('hidden')) {
-                    renderSchedule();
-                }
-            }, 1000); // 1000 milliseconds = 1 second
+            // Initial UI update
+            updateUI();
             
             // Set the day select to current day type
-            daySelect.value = isWeekdaySchedule() ? "weekday" : "weekend";
+            DOM.daySelect.value = isWeekdaySchedule() ? "weekday" : "weekend";
             
             // Initialize with the current view
-            tabCurrent.click();
+            DOM.tabCurrent.click();
+            
+            // Save preferences on unload
+            window.addEventListener('beforeunload', savePreferences);
         }
         
         // Start the app
