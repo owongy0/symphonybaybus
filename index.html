@@ -628,6 +628,16 @@
             font-weight: normal;
         }
         
+        .journey-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--inp-brd);
+            font-weight: 600;
+        }
+        
         .journey-details {
             display: flex;
             flex-direction: column;
@@ -635,8 +645,8 @@
         }
         
         .journey-step {
-            display: flex;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: 80px 1fr;
             padding: 8px 0;
             border-bottom: 1px solid var(--inp-brd);
             position: relative;
@@ -647,9 +657,9 @@
         }
         
         .step-time {
-            min-width: 80px;
             text-align: right;
             font-weight: 600;
+            padding-right: 10px;
         }
         
         .step-action {
@@ -1034,8 +1044,8 @@
                 <div class="form-group">
                     <label for="journey-type" data-en="Journey Type" data-zh="行程類型">Journey Type</label>
                     <select id="journey-type">
-                        <option value="depart" data-en="Depart At" data-zh="出發時間" selected>Depart At</option>
-                        <option value="arrive" data-en="Arrive By" data-zh="到達時間">Arrive By</option>
+                        <option value="depart" data-en="Depart At" data-zh="出發時間">Depart At</option>
+                        <option value="arrive" data-en="Arrive By" data-zh="到達時間" selected>Arrive By</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -2671,7 +2681,7 @@
                 elapsed = curMins + (24 * 60 - prevMins);
             }
             
-const prog = Math.min(100, Math.max(0, (elapsed / total) * 100));
+            const prog = Math.min(100, Math.max(0, (elapsed / total) * 100));
             
             // Check if route stops at the other estate
             const stopsAt = routeConfig[estate] && routeConfig[estate][key];
@@ -2876,435 +2886,560 @@ const prog = Math.min(100, Math.max(0, (elapsed / total) * 100));
         }
         
         // Journey Planner Functions
-        
-        // Calculate journey time between locations
-        function calculateJourneyTime(from, to, isSpecial = false) {
-            // Direct inter-estate travel
-            if ((from === 'vr' && to === 'vc') || (from === 'vc' && to === 'vr')) {
-                return runtimes.interEstate[`${from}-${to}`];
+        function planJourney() {
+            const origin = D.originSel.value;
+            const destination = D.destSel.value;
+            const journeyType = D.journeyType.value;
+            const journeyTime = D.journeyTime.value;
+            const journeyDate = D.journeyDate.value ? new Date(D.journeyDate.value) : new Date();
+            
+            if (origin === destination) {
+                alert(s.lang === 'en' ? 'Origin and destination cannot be the same.' : '出發地和目的地不能相同。');
+                return;
             }
             
-            // For special services
-            if (isSpecial) {
-                if (from === 'ntp') {
-                    if (to === 'sc') {
-                        return runtimes.special['ntp-sc'];
-                    } else { // to vr or vc
-                        // NTP → SC → Estate
-                        return runtimes.special['ntp-sc'] + runtimes.special['sc-est'];
-                    }
-                } else if (from === 'sc') {
-                    if (to === 'ntp') {
-                        return runtimes.special['sc-ntp'];
-                    } else { // to vr or vc
-                        return runtimes.special['sc-est'];
-                    }
-                } else { // from vr or vc
-                    if (to === 'ntp') {
-                        // Estate → SC → NTP
-                        return runtimes.special['est-sc'] + runtimes.special['sc-ntp'];
-                    } else if (to === 'sc') {
-                        return runtimes.special['est-sc'];
-                    }
-                }
-            }
+            // Determine day type based on selected date
+            const dayType = isWeekday(journeyDate) ? "weekday" : "weekend";
             
-            // For regular services
-            // Main routes
-            if (from === 'ntp' && to === 'vr') {
-                return runtimes.regular['ntp-vr'];
-            } else if (from === 'vr' && to === 'ntp') {
-                return runtimes.regular['vr-ntp'];
-            } else if (from === 'ntp' && to === 'vc') {
-                // NTP → VR → VC
-                return runtimes.regular['ntp-vr'] + runtimes.interEstate['vr-vc'];
-            } else if (from === 'vc' && to === 'ntp') {
-                // VC → VR → NTP
-                return runtimes.interEstate['vc-vr'] + runtimes.regular['vr-ntp'];
-            }
+            // Determine if this is an arrive-by or depart-at journey
+            const isArriveBy = journeyType === 'arrive';
             
-            // Short routes
-            if (from === 'sc' && to === 'vr') {
-                return runtimes.regular['sc-vr'];
-            } else if (from === 'vr' && to === 'sc') {
-                return runtimes.regular['vr-sc'];
-            } else if (from === 'sc' && to === 'vc') {
-                return runtimes.regular['sc-vc'];
-            } else if (from === 'vc' && to === 'sc') {
-                return runtimes.regular['vc-sc'];
+            if (isArriveBy) {
+                // Find buses that will arrive by the desired time
+                const results = findBusesToArriveBy(origin, destination, journeyTime, dayType);
+                renderJourneyResults(results, origin, destination);
+            } else {
+                // Find buses that depart after the desired time
+                const results = findBusesDepartingAfter(origin, destination, journeyTime, dayType);
+                renderJourneyResults(results, origin, destination);
             }
-            
-            // Fallback
-            return 15;
         }
         
-        // Find available buses for a journey
-        function findAvailableBuses(origin, destination, journeyTime, isArrival = false, date = new Date()) {
-            const isWkday = isWeekday(date);
-            const dayType = isWkday ? "weekday" : "weekend";
-            let result = [];
+        // Find buses that will get you to your destination by the desired arrival time
+        function findBusesToArriveBy(origin, destination, desiredArrivalTime, dayType) {
+            const desiredArrivalMins = toMins(desiredArrivalTime);
+            const results = [];
             
-            // Get all possible routes between origin and destination
-            const routes = getPossibleRoutes(origin, destination);
+            // Determine which schedule we need to look at based on the origin-destination pair
+            let schedule, journeyTime, via, routeKey, estateKey;
             
-            for (const route of routes) {
-                // Get schedule for this route
-                const schedule = getRouteSchedule(route, dayType);
-                if (!schedule) continue;
+            // Determine schedule and journey time based on origin-destination pair
+            if (origin === 'ntp' && destination === 'vr') {
+                estateKey = 'vr';
+                routeKey = 'ntp-vr';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = null;
+            } 
+            else if (origin === 'vr' && destination === 'ntp') {
+                estateKey = 'vr';
+                routeKey = 'vr-ntp';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = null;
+            }
+            else if (origin === 'sc' && destination === 'vr') {
+                estateKey = 'vr';
+                routeKey = 'sc-vr';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = 'vc'; // SC to VR buses go via VC
+            }
+            else if (origin === 'vr' && destination === 'sc') {
+                estateKey = 'vr';
+                routeKey = 'vr-sc';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = 'vc'; // VR to SC buses go via VC
+            }
+            else if (origin === 'ntp' && destination === 'vc') {
+                estateKey = 'vc';
+                routeKey = 'ntp-vc';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.regular['ntp-vr'] + runtimes.interEstate['vr-vc'];
+                via = 'vr'; // NTP to VC buses go via VR
+            }
+            else if (origin === 'vc' && destination === 'ntp') {
+                estateKey = 'vc';
+                routeKey = 'vc-ntp';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.interEstate['vc-vr'] + runtimes.regular['vr-ntp'];
+                via = 'vr'; // VC to NTP buses go via VR
+            }
+            else if (origin === 'sc' && destination === 'vc') {
+                estateKey = 'vc';
+                routeKey = 'sc-vc';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = null;
+            }
+            else if (origin === 'vc' && destination === 'sc') {
+                estateKey = 'vc';
+                routeKey = 'vc-sc';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = null;
+            }
+            else if (origin === 'vr' && destination === 'vc') {
+                // For VR to VC, use VR-SC bus and get off at VC
+                estateKey = 'vr';
+                routeKey = 'vr-sc';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.interEstate['vr-vc'];
+                via = null;
+            }
+            else if (origin === 'vc' && destination === 'vr') {
+                // For VC to VR, use VC-SC bus and get off at VR
+                estateKey = 'vc';
+                routeKey = 'vc-sc';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.interEstate['vc-vr'];
+                via = null;
+            }
+            
+            if (!schedule) {
+                return results;
+            }
+            
+            // Find buses that will get you there on time
+            for (const bus of schedule) {
+                const departTimeInMins = toMins(bus.time);
                 
-                for (const bus of schedule) {
-                    // Calculate departure and arrival times based on journey parameters
-                    let departTime, arriveTime;
-                    const journeyDuration = calculateJourneySegmentTime(route, origin, destination, bus.special);
+                // Calculate arrival time based on journey duration
+                let actualJourneyTime = journeyTime;
+                
+                // Adjust journey time for special services
+                if (bus.special) {
+                    if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc')) || 
+                        ((origin === 'vr' || origin === 'vc') && destination === 'ntp')) {
+                        // Special services between NTP and estates go via SC
+                        actualJourneyTime = runtimes.special['ntp-sc'] + runtimes.special['sc-est'];
+                        via = 'sc'; // Override via information for special services
+                    }
+                }
+                
+                const arriveTimeInMins = departTimeInMins + actualJourneyTime;
+                
+                // Check if this bus gets you there on time
+                if (arriveTimeInMins <= desiredArrivalMins) {
+                    // Calculate how early you arrive
+                    const minutesEarly = desiredArrivalMins - arriveTimeInMins;
                     
-                    if (isArrival) {
-                        // Working backwards from desired arrival time
-                        arriveTime = journeyTime;
-                        // Convert desired arrival time to minutes since midnight
-                        const targetArrivalMins = toMins(journeyTime);
-                        // Calculate departure time by subtracting journey duration
-                        const departMins = targetArrivalMins - journeyDuration;
-                        // Check if departure is on the previous day
-                        if (departMins < 0) {
-                            // Skip if requires departure from previous day
-                            continue;
-                        }
-                        // Format departure time
-                        const deptHours = Math.floor(departMins / 60);
-                        const deptMinutes = departMins % 60;
-                        departTime = `${deptHours.toString().padStart(2, '0')}:${deptMinutes.toString().padStart(2, '0')}`;
-                        
-                        // Check if the bus departure time is close to our calculated ideal departure time
-                        const busDepartMins = toMins(bus.time);
-                        // Allow a 30-minute window before the ideal departure (we can wait at the bus stop)
-                        if (busDepartMins > departMins || busDepartMins < departMins - 30) {
-                            continue;
-                        }
-                        
-                        // Recalculate actual arrival based on the bus's departure time
-                        const actualArrivalMins = busDepartMins + journeyDuration;
-                        const arrHours = Math.floor(actualArrivalMins / 60);
-                        const arrMinutes = actualArrivalMins % 60;
-                        arriveTime = `${arrHours.toString().padStart(2, '0')}:${arrMinutes.toString().padStart(2, '0')}`;
-                    } else {
-                        // Calculation for departure-based journey
-                        departTime = journeyTime;
-                        // Convert desired departure time to minutes since midnight
-                        const targetDepartureMins = toMins(journeyTime);
-                        
-                        // Get the next available bus after the target departure time
-                        const busDepartMins = toMins(bus.time);
-                        if (busDepartMins < targetDepartureMins) {
-                            continue;
+                    // Skip if arriving more than 30 minutes early
+                    if (minutesEarly > 30) continue;
+                    
+                    // Format arrival time
+                    const arriveTime = formatTime(arriveTimeInMins);
+                    
+                    // Via time (intermediate stop)
+                    let viaTime = null;
+                    if (via) {
+                        let viaJourneyTime;
+                        if (via === 'sc' && origin === 'ntp') {
+                            viaJourneyTime = runtimes.special['ntp-sc'];
+                        } else if (via === 'sc' && (origin === 'vr' || origin === 'vc')) {
+                            viaJourneyTime = runtimes.special['est-sc'];
+                        } else if (via === 'vr' && origin === 'ntp') {
+                            viaJourneyTime = runtimes.regular['ntp-vr'];
+                        } else if (via === 'vr' && origin === 'vc') {
+                            viaJourneyTime = runtimes.interEstate['vc-vr'];
+                        } else if (via === 'vc' && origin === 'vr') {
+                            viaJourneyTime = runtimes.interEstate['vr-vc'];
+                        } else if (via === 'vc' && origin === 'sc') {
+                            viaJourneyTime = runtimes.regular['sc-vc'];
                         }
                         
-                        // Calculate arrival time based on bus departure and journey duration
-                        const arrivalMins = busDepartMins + journeyDuration;
-                        // Format arrival time
-                        const arrHours = Math.floor(arrivalMins / 60);
-                        const arrMinutes = arrivalMins % 60;
-                        arriveTime = `${arrHours.toString().padStart(2, '0')}:${arrMinutes.toString().padStart(2, '0')}`;
+                        viaTime = formatTime(departTimeInMins + viaJourneyTime);
                     }
                     
-                    // Add this journey option to results
-                    result.push({
-                        route,
-                        busType: bus.special ? 'special' : 'regular',
+                    results.push({
                         departTime: bus.time,
-                        arriveTime,
-                        duration: journeyDuration,
-                        segments: calculateJourneySegments(route, origin, destination, bus.time, bus.special)
+                        arriveTime: arriveTime,
+                        minutesEarly: minutesEarly,
+                        journeyTime: actualJourneyTime,
+                        isSpecial: bus.special,
+                        via: via,
+                        viaTime: viaTime
                     });
                 }
             }
             
-            // Sort based on criteria (arrival time for depart-at journeys, departure time for arrive-by)
-            if (isArrival) {
-                // For arrive-by, prefer later departures (more sleep!)
-                result.sort((a, b) => toMins(b.departTime) - toMins(a.departTime));
-            } else {
-                // For depart-at, prefer earlier arrivals
-                result.sort((a, b) => toMins(a.arriveTime) - toMins(b.arriveTime));
-            }
+            // Sort by arrival time (less early is better)
+            results.sort((a, b) => a.minutesEarly - b.minutesEarly);
             
-            // Return top options
-            return result.slice(0, 3);
+            // Take top 3 results
+            return results.slice(0, 3);
         }
         
-        // Get possible route configurations between origin and destination
-        function getPossibleRoutes(origin, destination) {
-            const routes = [];
+        // Find buses departing after the specified time
+        function findBusesDepartingAfter(origin, destination, desiredDepartureTime, dayType) {
+            const desiredDepartureMins = toMins(desiredDepartureTime);
+            const results = [];
             
-            // Direct routes
-            if ((origin === 'ntp' && destination === 'vr') || (origin === 'vr' && destination === 'ntp')) {
-                routes.push(`${origin}-${destination}`);
-            } else if ((origin === 'sc' && destination === 'vr') || (origin === 'vr' && destination === 'sc')) {
-                routes.push(`${origin}-${destination}`);
-            } else if ((origin === 'sc' && destination === 'vc') || (origin === 'vc' && destination === 'sc')) {
-                routes.push(`${origin}-${destination}`);
-            } else if ((origin === 'ntp' && destination === 'vc') || (origin === 'vc' && destination === 'ntp')) {
-                routes.push(`${origin}-${destination}`);
+            // Determine which schedule we need to look at based on the origin-destination pair
+            let schedule, journeyTime, via, routeKey, estateKey;
+            
+            // Determine schedule and journey time based on origin-destination pair
+            if (origin === 'ntp' && destination === 'vr') {
+                estateKey = 'vr';
+                routeKey = 'ntp-vr';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = null;
+            } 
+            else if (origin === 'vr' && destination === 'ntp') {
+                estateKey = 'vr';
+                routeKey = 'vr-ntp';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = null;
+            }
+            else if (origin === 'sc' && destination === 'vr') {
+                estateKey = 'vr';
+                routeKey = 'sc-vr';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = 'vc'; // SC to VR buses go via VC
+            }
+            else if (origin === 'vr' && destination === 'sc') {
+                estateKey = 'vr';
+                routeKey = 'vr-sc';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = 'vc'; // VR to SC buses go via VC
+            }
+            else if (origin === 'ntp' && destination === 'vc') {
+                estateKey = 'vc';
+                routeKey = 'ntp-vc';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.regular['ntp-vr'] + runtimes.interEstate['vr-vc'];
+                via = 'vr'; // NTP to VC buses go via VR
+            }
+            else if (origin === 'vc' && destination === 'ntp') {
+                estateKey = 'vc';
+                routeKey = 'vc-ntp';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.interEstate['vc-vr'] + runtimes.regular['vr-ntp'];
+                via = 'vr'; // VC to NTP buses go via VR
+            }
+            else if (origin === 'sc' && destination === 'vc') {
+                estateKey = 'vc';
+                routeKey = 'sc-vc';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = null;
+            }
+            else if (origin === 'vc' && destination === 'sc') {
+                estateKey = 'vc';
+                routeKey = 'vc-sc';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.regular[routeKey];
+                via = null;
+            }
+            else if (origin === 'vr' && destination === 'vc') {
+                // For VR to VC, use VR-SC bus and get off at VC
+                estateKey = 'vr';
+                routeKey = 'vr-sc';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.interEstate['vr-vc'];
+                via = null;
+            }
+            else if (origin === 'vc' && destination === 'vr') {
+                // For VC to VR, use VC-SC bus and get off at VR
+                estateKey = 'vc';
+                routeKey = 'vc-sc';
+                schedule = schVC[routeKey][dayType];
+                journeyTime = runtimes.interEstate['vc-vr'];
+                via = null;
             }
             
-            // Inter-estate routes
-            if ((origin === 'vr' && destination === 'vc') || (origin === 'vc' && destination === 'vr')) {
-                // Direct travel or via SC route
-                routes.push(`${origin}-${destination}`);
-                // Additional possible routes via SC
-                routes.push(`${origin}-sc-${destination}`);
+            if (!schedule) {
+                return results;
             }
             
-            // Complex routes between NTP and SC
-            if ((origin === 'ntp' && destination === 'sc') || (origin === 'sc' && destination === 'ntp')) {
-                // Via either estate
-                routes.push(`${origin}-vr-${destination}`);
-                routes.push(`${origin}-vc-${destination}`);
-            }
-            
-            return routes;
-        }
-        
-        // Get a schedule for a specified route
-        function getRouteSchedule(route, dayType) {
-            const segments = route.split('-');
-            
-            // For simple routes, use the direct schedule
-            if (segments.length === 2) {
-                // Direct routes like ntp-vr, vr-ntp, sc-vr, vr-sc, etc.
-                if (segments[0] === 'vr' && segments[1] === 'vc' || segments[0] === 'vc' && segments[1] === 'vr') {
-                    // For estate-to-estate travel, check schedules that stop at both
-                    if (segments[0] === 'vr') {
-                        return schVR['vr-sc'][dayType]; // VR to SC buses stop at VC
-                    } else {
-                        return schVC['vc-sc'][dayType]; // VC to SC buses stop at VR
-                    }
-                }
+            // Find buses departing after the desired time
+            for (const bus of schedule) {
+                const departTimeInMins = toMins(bus.time);
                 
-                // For other direct routes, get the corresponding schedule
-                if (segments[0] === 'ntp' || segments[1] === 'ntp') {
-                    if (segments[0] === 'vr' || segments[1] === 'vr') {
-                        const key = `${segments[0]}-${segments[1]}`;
-                        return schVR[key][dayType];
-                    } else if (segments[0] === 'vc' || segments[1] === 'vc') {
-                        const key = `${segments[0]}-${segments[1]}`;
-                        return schVC[key][dayType];
-                    }
-                } else if (segments[0] === 'sc' || segments[1] === 'sc') {
-                    if (segments[0] === 'vr' || segments[1] === 'vr') {
-                        const key = `${segments[0]}-${segments[1]}`;
-                        return schVR[key][dayType];
-                    } else if (segments[0] === 'vc' || segments[1] === 'vc') {
-                        const key = `${segments[0]}-${segments[1]}`;
-                        return schVC[key][dayType];
-                    }
-                }
-            } else if (segments.length === 3) {
-                // Complex routes with intermediate stops like ntp-vr-sc or sc-vc-ntp
-                // Use the first segment's schedule as the starting point
-                const firstKey = `${segments[0]}-${segments[1]}`;
-                
-                if (segments[1] === 'vr') {
-                    return schVR[firstKey][dayType];
-                } else if (segments[1] === 'vc') {
-                    return schVC[firstKey][dayType];
-                } else if (segments[1] === 'sc') {
-                    if (segments[0] === 'ntp') {
-                        // For NTP-SC-VR/VC, we'd need special runs
-                        // Return all special runs
-                        if (segments[2] === 'vr') {
-                            return schVR['ntp-vr'][dayType].filter(b => b.special);
-                        } else {
-                            return schVC['ntp-vc'][dayType].filter(b => b.special);
+                // Check if this bus departs after the desired time
+                if (departTimeInMins >= desiredDepartureMins) {
+                    // Calculate how long to wait
+                    const minutesWait = departTimeInMins - desiredDepartureMins;
+                    
+                    // Skip if waiting more than 30 minutes
+                    if (minutesWait > 30) continue;
+                    
+                    // Calculate arrival time based on journey duration
+                    let actualJourneyTime = journeyTime;
+                    
+                    // Adjust journey time for special services
+                    if (bus.special) {
+                        if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc')) || 
+                            ((origin === 'vr' || origin === 'vc') && destination === 'ntp')) {
+                            // Special services between NTP and estates go via SC
+                            actualJourneyTime = runtimes.special['ntp-sc'] + runtimes.special['sc-est'];
+                            via = 'sc'; // Override via information for special services
                         }
                     }
+                    
+                    const arriveTimeInMins = departTimeInMins + actualJourneyTime;
+                    
+                    // Format arrival time
+                    const arriveTime = formatTime(arriveTimeInMins);
+                    
+                    // Via time (intermediate stop)
+                    let viaTime = null;
+                    if (via) {
+                        let viaJourneyTime;
+                        if (via === 'sc' && origin === 'ntp') {
+                            viaJourneyTime = runtimes.special['ntp-sc'];
+                        } else if (via === 'sc' && (origin === 'vr' || origin === 'vc')) {
+                            viaJourneyTime = runtimes.special['est-sc'];
+                        } else if (via === 'vr' && origin === 'ntp') {
+                            viaJourneyTime = runtimes.regular['ntp-vr'];
+                        } else if (via === 'vr' && origin === 'vc') {
+                            viaJourneyTime = runtimes.interEstate['vc-vr'];
+                        } else if (via === 'vc' && origin === 'vr') {
+                            viaJourneyTime = runtimes.interEstate['vr-vc'];
+                        } else if (via === 'vc' && origin === 'sc') {
+                            viaJourneyTime = runtimes.regular['sc-vc'];
+                        }
+                        
+                        viaTime = formatTime(departTimeInMins + viaJourneyTime);
+                    }
+                    
+                    results.push({
+                        departTime: bus.time,
+                        arriveTime: arriveTime,
+                        minutesWait: minutesWait,
+                        journeyTime: actualJourneyTime,
+                        isSpecial: bus.special,
+                        via: via,
+                        viaTime: viaTime
+                    });
                 }
             }
             
-            return null;
+            // Sort by departure time (less wait is better)
+            results.sort((a, b) => a.minutesWait - b.minutesWait);
+            
+            // Take top 3 results
+            return results.slice(0, 3);
         }
         
-        // Calculate journey time for a specific route segment
-        function calculateJourneySegmentTime(route, from, to, isSpecial = false) {
-            const segments = route.split('-');
-            
-            // Handle direct routes
-            if (segments.length === 2 && segments[0] === from && segments[1] === to) {
-                return calculateJourneyTime(from, to, isSpecial);
-            }
-            
-            // Handle multi-segment routes
-            let totalTime = 0;
-            
-            // Calculate time for first segment
-            if (segments[0] === from) {
-                totalTime += calculateJourneyTime(segments[0], segments[1], isSpecial);
-                
-                // Add time for second segment if needed
-                if (segments.length === 3 && segments[2] === to) {
-                    totalTime += calculateJourneyTime(segments[1], segments[2], isSpecial);
-                }
-            } else if (segments[1] === from) {
-                totalTime += calculateJourneyTime(segments[1], segments[2], isSpecial);
-            }
-            
-            return totalTime;
-        }
-        
-        // Break down journey into detailed segments for display
-        function calculateJourneySegments(route, from, to, departTime, isSpecial) {
-            const segments = [];
-            const routeParts = route.split('-');
-            let currentTime = departTime;
-            
-            // Process each segment in the route
-            for (let i = 0; i < routeParts.length - 1; i++) {
-                const segmentFrom = routeParts[i];
-                const segmentTo = routeParts[i + 1];
-                
-                // Skip segments not relevant to this journey
-                if ((i === 0 && segmentFrom !== from) || 
-                    (i === routeParts.length - 2 && segmentTo !== to)) {
-                    continue;
-                }
-                
-                // Calculate time for this segment
-                const segmentDuration = calculateJourneyTime(segmentFrom, segmentTo, isSpecial);
-                
-                // Calculate arrival time at this segment
-                const departMins = toMins(currentTime);
-                const arrivalMins = departMins + segmentDuration;
-                const arrHours = Math.floor(arrivalMins / 60);
-                const arrMinutes = arrivalMins % 60;
-                const arriveTime = `${arrHours.toString().padStart(2, '0')}:${arrMinutes.toString().padStart(2, '0')}`;
-                
-                // Generate segment description
-                const action = i === 0 ? 
-                    (isSpecial ? 'board_special' : 'board') : 
-                    'continue';
-                
-                segments.push({
-                    action,
-                    from: segmentFrom,
-                    to: segmentTo,
-                    departTime: currentTime,
-                    arriveTime,
-                    duration: segmentDuration
-                });
-                
-                // Update current time for next segment
-                currentTime = arriveTime;
-            }
-            
-            return segments;
+        // Format time in minutes to HH:MM format
+        function formatTime(minutes) {
+            const hours = Math.floor(minutes / 60) % 24;
+            const mins = minutes % 60;
+            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
         }
         
         // Format journey duration in minutes to human-readable format
         function formatDuration(minutes) {
             if (minutes < 60) {
-                return `${minutes} min`;
+                return `${minutes} ${s.lang === 'en' ? 'min' : '分鐘'}`;
             } else {
                 const hours = Math.floor(minutes / 60);
                 const mins = minutes % 60;
-                return `${hours} hr ${mins} min`;
+                return `${hours} ${s.lang === 'en' ? 'hr' : '小時'} ${mins} ${s.lang === 'en' ? 'min' : '分鐘'}`;
             }
         }
         
-        // Render journey results
-        function renderJourneyResults(journeyOptions) {
-            const resultsContainer = D.journeyResults;
-            resultsContainer.innerHTML = '';
+        // Format early arrival text
+        function formatEarlyArrival(minutes) {
+            if (minutes === 0) {
+                return s.lang === 'en' ? 'Arrives exactly on time' : '準時到達';
+            } else {
+                return s.lang === 'en' ? 
+                    `Arrives ${minutes} ${minutes === 1 ? 'minute' : 'minutes'} early` : 
+                    `提早 ${minutes} 分鐘到達`;
+            }
+        }
+        
+        // Format wait time text
+        function formatWaitTime(minutes) {
+            if (minutes === 0) {
+                return s.lang === 'en' ? 'Departs immediately' : '馬上出發';
+            } else {
+                return s.lang === 'en' ? 
+                    `Wait ${minutes} ${minutes === 1 ? 'minute' : 'minutes'} for bus` : 
+                    `等候 ${minutes} 分鐘上車`;
+            }
+        }
+        
+        // Show journey results
+        function renderJourneyResults(results, origin, destination) {
+            const resultsDiv = D.journeyResults;
+            resultsDiv.innerHTML = '';
             
-            if (journeyOptions.length === 0) {
-                const noResultsMsg = document.createElement('div');
-                noResultsMsg.className = 'journey-card';
-                noResultsMsg.textContent = s.lang === 'en' ? 
-                    'No suitable buses found for this journey. Try different times or locations.' :
-                    '找不到合適的巴士。請嘗試不同的時間或地點。';
-                resultsContainer.appendChild(noResultsMsg);
+            if (results.length === 0) {
+                showNoJourneyResults();
                 return;
             }
             
             // Create journey card
-            const journeyCard = document.createElement('div');
-            journeyCard.className = 'journey-card';
+            const card = document.createElement('div');
+            card.className = 'journey-card';
             
             // Add header
-            const header = document.createElement('div');
-            header.className = 'journey-header';
+            const header = document.createElement('h3');
+            header.textContent = s.lang === 'en' ? 
+                `Buses from ${locText[s.lang][origin]} to ${locText[s.lang][destination]}` :
+                `由${locText[s.lang][origin]}前往${locText[s.lang][destination]}的巴士`;
+            card.appendChild(header);
             
-            const title = document.createElement('h3');
-            title.textContent = s.lang === 'en' ? 'Journey Options' : '行程選項';
-            header.appendChild(title);
-            
-            journeyCard.appendChild(header);
-            
-            // Add each journey option
-            journeyOptions.forEach((option, index) => {
-                const optionEl = document.createElement('div');
-                optionEl.className = 'journey-option';
+            // Add each suggestion
+            results.forEach((result, i) => {
+                const option = document.createElement('div');
+                option.className = 'journey-option';
                 
-                const optionHeader = document.createElement('h4');
-                optionHeader.innerHTML = `${s.lang === 'en' ? 'Option' : '選項'} ${index + 1} <span>${formatDuration(option.duration)}</span>`;
-                optionEl.appendChild(optionHeader);
+                // Create option header
+                const optionTitle = document.createElement('h4');
+                optionTitle.innerHTML = `${s.lang === 'en' ? 'Option' : '選項'} ${i+1} <span>${formatDuration(result.journeyTime)}</span>`;
+                option.appendChild(optionTitle);
                 
-                const details = document.createElement('div');
-                details.className = 'journey-details';
+                // Create journey info summary
+                const summary = document.createElement('div');
+                summary.className = 'journey-info';
                 
-                // Add each segment in the journey
-                option.segments.forEach(segment => {
-                    const step = document.createElement('div');
-                    step.className = 'journey-step';
+                // Create route description
+                const routeDesc = document.createElement('div');
+                let routeTxt = '';
+                if (result.via) {
+                    routeTxt = s.lang === 'en' ? 
+                        `${locText[s.lang][origin]} → ${locText[s.lang][result.via]} → ${locText[s.lang][destination]}` :
+                        `${locText[s.lang][origin]} → ${locText[s.lang][result.via]} → ${locText[s.lang][destination]}`;
+                } else {
+                    routeTxt = s.lang === 'en' ? 
+                        `${locText[s.lang][origin]} → ${locText[s.lang][destination]}` :
+                        `${locText[s.lang][origin]} → ${locText[s.lang][destination]}`;
+                }
+                
+                routeDesc.textContent = routeTxt;
+                summary.appendChild(routeDesc);
+                
+                // Create early arrival text or wait time text
+                const infoText = document.createElement('div');
+                if (result.minutesEarly !== undefined) {
+                    infoText.textContent = formatEarlyArrival(result.minutesEarly);
+                } else {
+                    infoText.textContent = formatWaitTime(result.minutesWait);
+                }
+                summary.appendChild(infoText);
+                
+                option.appendChild(summary);
+                
+                // Create steps timeline
+                const steps = document.createElement('div');
+                steps.className = 'journey-details';
+                
+                // Departure step
+                const departStep = document.createElement('div');
+                departStep.className = 'journey-step';
+                
+                const departTime = document.createElement('div');
+                departTime.className = 'step-time';
+                departTime.textContent = result.departTime;
+                departStep.appendChild(departTime);
+                
+                const departAction = document.createElement('div');
+                departAction.className = 'step-action';
+                if (result.isSpecial) {
+                    departAction.classList.add('special');
+                }
+                
+                const busTypeText = result.isSpecial ? (s.lang === 'en' ? 'special bus' : '特別巴士') : (s.lang === 'en' ? 'bus' : '巴士');
+                departAction.textContent = s.lang === 'en' ? 
+                    `Board ${busTypeText} at ${locText[s.lang][origin]}` :
+                    `在${locText[s.lang][origin]}上車 (${busTypeText})`;
+                departStep.appendChild(departAction);
+                
+                steps.appendChild(departStep);
+                
+                // Intermediate stop if applicable
+                if (result.via && result.viaTime) {
+                    const viaStep = document.createElement('div');
+                    viaStep.className = 'journey-step';
                     
-                    const time = document.createElement('div');
-                    time.className = 'step-time';
-                    time.textContent = segment.departTime;
-                    step.appendChild(time);
+                    const viaTimeEl = document.createElement('div');
+                    viaTimeEl.className = 'step-time';
+                    viaTimeEl.textContent = result.viaTime;
+                    viaStep.appendChild(viaTimeEl);
                     
-                    const action = document.createElement('div');
-                    action.className = 'step-action';
-                    if (segment.action === 'board_special') {
-                        action.classList.add('special');
-                    }
+                    const viaAction = document.createElement('div');
+                    viaAction.className = 'step-action';
                     
-                    let actionText = '';
-                    if (segment.action === 'board' || segment.action === 'board_special') {
-                        actionText = s.lang === 'en' ? 
-                            `Board ${segment.action === 'board_special' ? 'special ' : ''}bus from ${locText[s.lang][segment.from]} to ${locText[s.lang][segment.to]}` :
-                            `從${locText[s.lang][segment.from]}乘搭${segment.action === 'board_special' ? '特別' : ''}巴士往${locText[s.lang][segment.to]}`;
+                    // Adjust text based on whether this is a stop or a transfer
+                    if ((origin === 'ntp' && destination === 'vr' && result.via === 'sc' && result.isSpecial) ||
+                        (origin === 'vr' && destination === 'ntp' && result.via === 'sc' && result.isSpecial)) {
+                        // For special services that go via SC
+                        viaAction.textContent = s.lang === 'en' ? 
+                            `Transfer at ${locText[s.lang][result.via]}` :
+                            `在${locText[s.lang][result.via]}轉車`;
                     } else {
-                        actionText = s.lang === 'en' ? 
-                            `Continue to ${locText[s.lang][segment.to]}` :
-                            `繼續往${locText[s.lang][segment.to]}`;
+                        viaAction.textContent = s.lang === 'en' ? 
+                            `Pass through ${locText[s.lang][result.via]}` :
+                            `途經${locText[s.lang][result.via]}`;
                     }
-                    action.textContent = actionText;
-                    step.appendChild(action);
                     
-                    details.appendChild(step);
-                });
+                    viaStep.appendChild(viaAction);
+                    
+                    steps.appendChild(viaStep);
+                }
                 
-                // Add arrival at final destination
-                const arrivalStep = document.createElement('div');
-                arrivalStep.className = 'journey-step';
+                // Arrival step
+                const arriveStep = document.createElement('div');
+                arriveStep.className = 'journey-step';
                 
-                const arrivalTime = document.createElement('div');
-                arrivalTime.className = 'step-time';
-                arrivalTime.textContent = option.arriveTime;
-                arrivalStep.appendChild(arrivalTime);
+                const arriveTime = document.createElement('div');
+                arriveTime.className = 'step-time';
+                arriveTime.textContent = result.arriveTime;
+                arriveStep.appendChild(arriveTime);
                 
-                const arrivalAction = document.createElement('div');
-                arrivalAction.className = 'step-action';
-                arrivalAction.textContent = s.lang === 'en' ? 
-                    `Arrive at ${locText[s.lang][to]}` :
-                    `到達${locText[s.lang][to]}`;
-                arrivalStep.appendChild(arrivalAction);
+                const arriveAction = document.createElement('div');
+                arriveAction.className = 'step-action';
+                arriveAction.textContent = s.lang === 'en' ? 
+                    `Arrive at ${locText[s.lang][destination]}` :
+                    `到達${locText[s.lang][destination]}`;
+                arriveStep.appendChild(arriveAction);
                 
-                details.appendChild(arrivalStep);
+                steps.appendChild(arriveStep);
                 
-                optionEl.appendChild(details);
-                journeyCard.appendChild(optionEl);
+                option.appendChild(steps);
+                card.appendChild(option);
             });
             
-            resultsContainer.appendChild(journeyCard);
+            resultsDiv.appendChild(card);
+        }
+        
+        // Show "no results" message
+        function showNoJourneyResults() {
+            const resultsDiv = D.journeyResults;
+            resultsDiv.innerHTML = '';
+            
+            const noResults = document.createElement('div');
+            noResults.className = 'journey-card';
+            noResults.textContent = s.lang === 'en' ? 
+                'No suitable buses found for this journey. Try a different time or date.' : 
+                '找不到合適的巴士。請嘗試不同的時間或日期。';
+            
+            resultsDiv.appendChild(noResults);
+        }
+        
+        // Initialize journey planner with today's date
+        function initJourneyPlanner() {
+            const today = new Date().toISOString().split('T')[0];
+            D.journeyDate.value = today;
+            
+            // Set default arrival time to 30 minutes from now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 30);
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            D.journeyTime.value = `${hours}:${minutes}`;
+            
+            // Add event listener for journey planning
+            D.journeyPlanBtn.addEventListener('click', planJourney);
         }
         
         // Runtime Editor Functions
@@ -3387,27 +3522,6 @@ const prog = Math.min(100, Math.max(0, (elapsed / total) * 100));
             }
         }
         
-        // Setup event listeners for journey planner
-        D.journeyPlanBtn.addEventListener('click', () => {
-            const from = D.originSel.value;
-            const to = D.destSel.value;
-            const isArrival = D.journeyType.value === 'arrive';
-            const time = D.journeyTime.value;
-            const date = new Date(D.journeyDate.value);
-            
-            if (from === to) {
-                alert(s.lang === 'en' ? 'Origin and destination cannot be the same.' : '出發地和目的地不能相同。');
-                return;
-            }
-            
-            const journeyOptions = findAvailableBuses(from, to, time, isArrival, date);
-            renderJourneyResults(journeyOptions);
-        });
-        
-        // Setup event listeners for runtime editor
-        D.runtimeSave.addEventListener('click', saveRuntimeValues);
-        D.runtimeReset.addEventListener('click', resetRuntimeValues);
-        
         function updateUI() {
             if (animID) {
                 cancelAnimationFrame(animID);
@@ -3470,9 +3584,12 @@ const prog = Math.min(100, Math.max(0, (elapsed / total) * 100));
             D.daySelVR.value = isWkday ? "weekday" : "weekend";
             D.daySelVC.value = isWkday ? "weekday" : "weekend";
             
-            // Set today's date as default for journey planner
-            const today = new Date().toISOString().split('T')[0];
-            D.journeyDate.value = today;
+            // Initialize journey planner
+            initJourneyPlanner();
+            
+            // Setup runtime editor event listeners
+            D.runtimeSave.addEventListener('click', saveRuntimeValues);
+            D.runtimeReset.addEventListener('click', resetRuntimeValues);
             
             D.tabCur.click();
             window.addEventListener('beforeunload', savePrefs);
