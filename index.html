@@ -30,6 +30,11 @@
             --est-bg: #f5f7fa;
             --est-act: #3498db;
             --est-inact: #ecf0f1;
+            --nav-bg: white;
+            --nav-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            --nav-active: rgba(52, 152, 219, 0.2);
+            --settings-bg: rgba(0,0,0,0.5);
+            --icon-color: #3498db;
         }
         
         @media (prefers-color-scheme: dark) {
@@ -57,6 +62,11 @@
                 --est-bg: #2c2c2c;
                 --est-act: #2980b9;
                 --est-inact: #444;
+                --nav-bg: #2c2c2c;
+                --nav-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+                --nav-active: rgba(41, 128, 185, 0.4);
+                --settings-bg: rgba(0,0,0,0.8);
+                --icon-color: #3498db;
             }
         }
         
@@ -72,7 +82,7 @@
             background-color: var(--bg);
             color: var(--txt);
             line-height: 1.6;
-            padding: 15px;
+            padding: 15px 15px 80px;
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -217,56 +227,107 @@
             margin-top: 3px;
         }
         
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .tab {
-            padding: 10px 15px;
-            background-color: var(--tog-bg);
-            color: var(--tog-txt);
+        .settings-btn {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background: none;
             border: none;
+            color: var(--icon-color);
+            font-size: 1.5rem;
             cursor: pointer;
-            margin: 3px;
-            border-radius: 5px;
-            font-weight: 600;
-            transition: all 0.3s;
-            flex: 1;
-            text-align: center;
-            font-size: 0.9rem;
+            z-index: 100;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s;
         }
         
-        .tab.active {
-            background-color: var(--pri);
-            color: white;
+        .settings-btn:hover {
+            background-color: var(--tog-bg);
+        }
+        
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--settings-bg);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .settings-panel {
+            background-color: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--inp-brd);
+            padding-bottom: 10px;
+        }
+        
+        .settings-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--pri);
+        }
+        
+        .close-settings {
+            background: none;
+            border: none;
+            color: var(--txt-sec);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .settings-section {
+            margin-bottom: 20px;
+        }
+        
+        .settings-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--txt);
         }
         
         .lang-tog {
             display: flex;
-            align-items: center;
-            gap: 5px;
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            z-index: 100;
+            gap: 10px;
         }
         
         .lang-tog button {
-            padding: 3px 6px;
+            padding: 8px 12px;
             background-color: var(--tog-bg);
             color: var(--tog-txt);
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
-            font-size: 0.8rem;
+            flex: 1;
         }
         
         .lang-tog button.active {
@@ -496,7 +557,7 @@
             background-color: var(--pri);
         }
         
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         
         .legend {
             display: flex;
@@ -740,13 +801,61 @@
             margin-top: 15px;
         }
         
+        /* Mobile Navigation Bar */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: var(--nav-shadow);
+            z-index: 900;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            padding: 8px 0;
+            border-radius: 8px;
+            color: var(--txt-sec);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active {
+            background-color: var(--nav-active);
+            color: var(--icon-color);
+        }
+        
+        .nav-icon {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+            line-height: 1;
+            color: var(--icon-color);
+        }
+        
+        .nav-item:not(.active) .nav-icon {
+            opacity: 0.6;
+        }
+        
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
         @media (max-width: 768px) {
             .sched-head { flex-direction: column; align-items: flex-start; }
             .sched-title { margin-bottom: 10px; }
         }
         
         @media (max-width: 600px) {
-            body { padding: 10px; }
+            body { padding: 10px 10px 80px; }
             .next-bus-card { flex: 1 1 100%; }
             .time-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
             .time-cont { width: 100%; justify-content: center; }
@@ -756,11 +865,6 @@
 </head>
 <body>
     <header>
-        <div class="lang-tog">
-            <button id="en-tog" class="active">EN</button>
-            <button id="zh-tog">中</button>
-        </div>
-        
         <div class="est-tog">
             <button id="vr-tog" class="active" data-en="Villa Rhapsody" data-zh="凱琴居">Villa Rhapsody</button>
             <button id="vc-tog" data-en="Villa Concerto" data-zh="凱弦居">Villa Concerto</button>
@@ -793,11 +897,106 @@
         </div>
     </header>
     
-    <div class="tabs">
-        <button class="tab active" id="tab-cur" data-en="Next Buses" data-zh="下一班車">Next Buses</button>
-        <button class="tab" id="tab-sched" data-en="Full Schedule" data-zh="完整時間表">Full Schedule</button>
-        <button class="tab" id="tab-journey" data-en="Plan Journey" data-zh="計劃行程">Plan Journey</button>
-        <button class="tab" id="tab-runtime" data-en="Edit Runtimes" data-zh="編輯行車時間">Edit Runtimes</button>
+    <!-- Settings Overlay -->
+    <div class="settings-overlay" id="settings-overlay">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <div class="settings-title" data-en="Settings" data-zh="設定">Settings</div>
+                <button class="close-settings" id="close-settings">×</button>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title" data-en="Language" data-zh="語言">Language</div>
+                <div class="lang-tog">
+                    <button id="en-tog" class="active">English</button>
+                    <button id="zh-tog">中文</button>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title" data-en="Runtime Settings" data-zh="行車時間設定">Runtime Settings</div>
+                <div class="runtime-editor">
+                    <div class="runtime-grid">
+                        <div class="runtime-group">
+                            <h4 data-en="Regular Services (Main Routes)" data-zh="正常班次 (主線)">Regular Services (Main Routes)</h4>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="NTP to VR" data-zh="新城市廣場 → 凱琴居">NTP to VR</div>
+                                <input type="number" id="rt-reg-ntp-vr" class="runtime-input" value="15" min="1">
+                            </div>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="VR to NTP" data-zh="凱琴居 → 新城市廣場">VR to NTP</div>
+                                <input type="number" id="rt-reg-vr-ntp" class="runtime-input" value="15" min="1">
+                            </div>
+                        </div>
+                        
+                        <div class="runtime-group">
+                            <h4 data-en="Regular Services (Short Routes)" data-zh="正常班次 (短途線)">Regular Services (Short Routes)</h4>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="SC to VC" data-zh="新港城 → 凱弦居">SC to VC</div>
+                                <input type="number" id="rt-reg-sc-vc" class="runtime-input" value="7" min="1">
+                            </div>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="VC to SC" data-zh="凱弦居 → 新港城">VC to SC</div>
+                                <input type="number" id="rt-reg-vc-sc" class="runtime-input" value="7" min="1">
+                            </div>
+                        </div>
+                        
+                        <div class="runtime-group">
+                            <h4 data-en="Special Service Runtimes" data-zh="特別班次行車時間">Special Service Runtimes</h4>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="NTP to SC" data-zh="新城市廣場 → 新港城">NTP to SC</div>
+                                <input type="number" id="rt-spec-ntp-sc" class="runtime-input" value="15" min="1">
+                            </div>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="SC to VR" data-zh="新港城 → 凱琴居">SC to VR</div>
+                                <input type="number" id="rt-spec-sc-vr" class="runtime-input" value="5" min="1">
+                            </div>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="SC to VC" data-zh="新港城 → 凱弦居">SC to VC</div>
+                                <input type="number" id="rt-spec-sc-vc" class="runtime-input" value="5" min="1">
+                            </div>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="VR to SC" data-zh="凱琴居 → 新港城">VR to SC</div>
+                                <input type="number" id="rt-spec-vr-sc" class="runtime-input" value="5" min="1">
+                            </div>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="VC to SC" data-zh="凱弦居 → 新港城">VC to SC</div>
+                                <input type="number" id="rt-spec-vc-sc" class="runtime-input" value="5" min="1">
+                            </div>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="SC to NTP" data-zh="新港城 → 新城市廣場">SC to NTP</div>
+                                <input type="number" id="rt-spec-sc-ntp" class="runtime-input" value="15" min="1">
+                            </div>
+                        </div>
+                        
+                        <div class="runtime-group">
+                            <h4 data-en="Inter-Estate Travel" data-zh="屋苑之間的行車時間">Inter-Estate Travel</h4>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="VR to VC" data-zh="凱琴居 → 凱弦居">VR to VC</div>
+                                <input type="number" id="rt-inter-vr-vc" class="runtime-input" value="3" min="1">
+                            </div>
+                            <div class="runtime-row">
+                                <div class="runtime-label" data-en="VC to VR" data-zh="凱弦居 → 凱琴居">VC to VR</div>
+                                <input type="number" id="rt-inter-vc-vr" class="runtime-input" value="3" min="1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="runtime-actions">
+                        <button id="runtime-save" data-en="Save Changes" data-zh="保存更改">Save Changes</button>
+                        <button id="runtime-reset" data-en="Reset to Default" data-zh="重設為默認值">Reset to Default</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title" data-en="About" data-zh="關於">About</div>
+                <p data-en="Estate Shuttle Bus Schedule app provides real-time information for shuttle buses between New Town Plaza, Sunshine City, Villa Rhapsody, and Villa Concerto." 
+                   data-zh="屋苑穿梭巴士時刻表應用程式為往來新城市廣場、新港城、凱琴居及凱弦居的穿梭巴士提供實時資訊。">
+                    Estate Shuttle Bus Schedule app provides real-time information for shuttle buses between New Town Plaza, Sunshine City, Villa Rhapsody, and Villa Concerto.
+                </p>
+            </div>
+        </div>
     </div>
     
     <!-- Villa Rhapsody View -->
@@ -1068,81 +1267,46 @@
         </div>
     </div>
     
-    <!-- Runtime Editor View -->
-    <div id="runtime-view" class="hidden">
-        <div class="runtime-editor">
-            <div class="runtime-title" data-en="Bus Runtime Editor" data-zh="行車時間編輯器">Bus Runtime Editor</div>
-            
-            <div class="runtime-grid">
-                <div class="runtime-group">
-                    <h4 data-en="Regular Services (Main Routes)" data-zh="正常班次 (主線)">Regular Services (Main Routes)</h4>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="NTP to VR" data-zh="新城市廣場 → 凱琴居">NTP to VR</div>
-                        <input type="number" id="rt-reg-ntp-vr" class="runtime-input" value="15" min="1">
-                    </div>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="VR to NTP" data-zh="凱琴居 → 新城市廣場">VR to NTP</div>
-                        <input type="number" id="rt-reg-vr-ntp" class="runtime-input" value="15" min="1">
-                    </div>
-                </div>
-                
-                <div class="runtime-group">
-                    <h4 data-en="Regular Services (Short Routes)" data-zh="正常班次 (短途線)">Regular Services (Short Routes)</h4>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="SC to VR" data-zh="新港城 → 凱琴居">SC to VR</div>
-                        <input type="number" id="rt-reg-sc-vr" class="runtime-input" value="10" min="1">
-                    </div>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="SC to VC" data-zh="新港城 → 凱弦居">SC to VC</div>
-                        <input type="number" id="rt-reg-sc-vc" class="runtime-input" value="7" min="1">
-                    </div>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="VR to SC" data-zh="凱琴居 → 新港城">VR to SC</div>
-                        <input type="number" id="rt-reg-vr-sc" class="runtime-input" value="10" min="1">
-                    </div>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="VC to SC" data-zh="凱弦居 → 新港城">VC to SC</div>
-                        <input type="number" id="rt-reg-vc-sc" class="runtime-input" value="7" min="1">
-                    </div>
-                </div>
-                
-                <div class="runtime-group">
-                    <h4 data-en="Special Service Runtimes" data-zh="特別班次行車時間">Special Service Runtimes</h4>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="NTP to SC" data-zh="新城市廣場 → 新港城">NTP to SC</div>
-                        <input type="number" id="rt-spec-ntp-sc" class="runtime-input" value="15" min="1">
-                    </div>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="SC to Estate" data-zh="新港城 → 屋苑">SC to Estate</div>
-                        <input type="number" id="rt-spec-sc-est" class="runtime-input" value="5" min="1">
-                    </div>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="Estate to SC" data-zh="屋苑 → 新港城">Estate to SC</div>
-                        <input type="number" id="rt-spec-est-sc" class="runtime-input" value="5" min="1">
-                    </div>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="SC to NTP" data-zh="新港城 → 新城市廣場">SC to NTP</div>
-                        <input type="number" id="rt-spec-sc-ntp" class="runtime-input" value="15" min="1">
-                    </div>
-                </div>
-                
-                <div class="runtime-group">
-                    <h4 data-en="Inter-Estate Travel" data-zh="屋苑之間的行車時間">Inter-Estate Travel</h4>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="VR to VC" data-zh="凱琴居 → 凱弦居">VR to VC</div>
-                        <input type="number" id="rt-inter-vr-vc" class="runtime-input" value="3" min="1">
-                    </div>
-                    <div class="runtime-row">
-                        <div class="runtime-label" data-en="VC to VR" data-zh="凱弦居 → 凱琴居">VC to VR</div>
-                        <input type="number" id="rt-inter-vc-vr" class="runtime-input" value="3" min="1">
-                    </div>
-                </div>
+    <!-- Mobile Navigation Bar -->
+    <div class="mobile-nav">
+        <div class="nav-item active" id="nav-next">
+            <div class="nav-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
             </div>
-            
-            <div class="runtime-actions">
-                <button id="runtime-save" data-en="Save Changes" data-zh="保存更改">Save Changes</button>
-                <button id="runtime-reset" data-en="Reset to Default" data-zh="重設為默認值">Reset to Default</button>
+            <div class="nav-label" data-en="Next" data-zh="下一班">Next</div>
+        </div>
+        <div class="nav-item" id="nav-schedule">
+            <div class="nav-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
             </div>
+            <div class="nav-label" data-en="Schedule" data-zh="時間表">Schedule</div>
+        </div>
+        <div class="nav-item" id="nav-journey">
+            <div class="nav-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 11a9 9 0 0 1 9 9"></path>
+                    <path d="M4 4a16 16 0 0 1 16 16"></path>
+                    <circle cx="5" cy="19" r="2"></circle>
+                </svg>
+            </div>
+            <div class="nav-label" data-en="Journey" data-zh="行程">Journey</div>
+        </div>
+        <div class="nav-item" id="nav-settings">
+            <div class="nav-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </div>
+            <div class="nav-label" data-en="Settings" data-zh="設定">Settings</div>
         </div>
     </div>
 
@@ -1153,17 +1317,16 @@
             vrView: document.getElementById('vr-view'),
             vcView: document.getElementById('vc-view'),
             
-            tabCur: document.getElementById('tab-cur'),
-            tabSched: document.getElementById('tab-sched'),
-            tabJourney: document.getElementById('tab-journey'),
-            tabRuntime: document.getElementById('tab-runtime'),
+            navNext: document.getElementById('nav-next'),
+            navSchedule: document.getElementById('nav-schedule'),
+            navJourney: document.getElementById('nav-journey'),
+            navSettings: document.getElementById('nav-settings'),
             
             curVR: document.getElementById('cur-vr'),
             schedVR: document.getElementById('sched-vr'),
             curVC: document.getElementById('cur-vc'),
             schedVC: document.getElementById('sched-vc'),
             journeyView: document.getElementById('journey-view'),
-            runtimeView: document.getElementById('runtime-view'),
             
             routeSelVR: document.getElementById('route-sel-vr'),
             daySelVR: document.getElementById('day-sel-vr'),
@@ -1248,6 +1411,11 @@
             dayType: document.getElementById('day-type'),
             holidayName: document.getElementById('holiday-name'),
             
+            // Settings
+            settingsBtn: document.getElementById('nav-settings'),
+            settingsOverlay: document.getElementById('settings-overlay'),
+            closeSettings: document.getElementById('close-settings'),
+            
             // Journey Planner
             originSel: document.getElementById('origin'),
             destSel: document.getElementById('destination'),
@@ -1260,13 +1428,13 @@
             // Runtime Editor
             rtRegNTPVR: document.getElementById('rt-reg-ntp-vr'),
             rtRegVRNTP: document.getElementById('rt-reg-vr-ntp'),
-            rtRegSCVR: document.getElementById('rt-reg-sc-vr'),
             rtRegSCVC: document.getElementById('rt-reg-sc-vc'),
-            rtRegVRSC: document.getElementById('rt-reg-vr-sc'),
             rtRegVCSC: document.getElementById('rt-reg-vc-sc'),
             rtSpecNTPSC: document.getElementById('rt-spec-ntp-sc'),
-            rtSpecSCEst: document.getElementById('rt-spec-sc-est'),
-            rtSpecEstSC: document.getElementById('rt-spec-est-sc'),
+            rtSpecSCVR: document.getElementById('rt-spec-sc-vr'),
+            rtSpecSCVC: document.getElementById('rt-spec-sc-vc'),
+            rtSpecVRSC: document.getElementById('rt-spec-vr-sc'),
+            rtSpecVCSC: document.getElementById('rt-spec-vc-sc'),
             rtSpecSCNTP: document.getElementById('rt-spec-sc-ntp'),
             rtInterVRVC: document.getElementById('rt-inter-vr-vc'),
             rtInterVCVR: document.getElementById('rt-inter-vc-vr'),
@@ -1315,15 +1483,17 @@
             regular: {
                 'ntp-vr': 15,    // NTP to VR: 15 minutes
                 'vr-ntp': 15,    // VR to NTP: 15 minutes
-                'sc-vr': 10,     // SC to VR: 10 minutes
+                'sc-vr': 10,     // SC to VR: 10 minutes (calculated based on sc-vc + vc-vr)
                 'sc-vc': 7,      // SC to VC: 7 minutes
-                'vr-sc': 10,     // VR to SC: 10 minutes
+                'vr-sc': 10,     // VR to SC: 10 minutes (calculated based on vr-vc + vc-sc)
                 'vc-sc': 7       // VC to SC: 7 minutes
             },
             special: {
                 'ntp-sc': 15,    // NTP to SC: 15 minutes
-                'sc-est': 5,     // SC to Estate: 5 minutes
-                'est-sc': 5,     // Estate to SC: 5 minutes
+                'sc-vr': 5,      // SC to VR: 5 minutes
+                'sc-vc': 5,      // SC to VC: 5 minutes
+                'vr-sc': 5,      // VR to SC: 5 minutes
+                'vc-sc': 5,      // VC to SC: 5 minutes
                 'sc-ntp': 15     // SC to NTP: 15 minutes
             },
             interEstate: {
@@ -2336,79 +2506,93 @@
         
         let animID = null;
         
-        D.tabCur.addEventListener('click', () => {
-            if (s.mode !== 'current') {
-                resetAllTabs();
-                D.tabCur.classList.add('active');
-                
-                if (s.estate === 'vr') {
-                    D.curVR.classList.remove('hidden');
-                } else {
-                    D.curVC.classList.remove('hidden');
-                }
-                
-                s.mode = 'current';
-                updateBuses();
-            }
+        // Mobile Navigation Bar Event Listeners
+        D.navNext.addEventListener('click', () => {
+            activateNavItem(D.navNext);
+            showNextBuses();
         });
         
-        D.tabSched.addEventListener('click', () => {
-            if (s.mode !== 'schedule') {
-                resetAllTabs();
-                D.tabSched.classList.add('active');
-                
-                if (s.estate === 'vr') {
-                    D.schedVR.classList.remove('hidden');
-                    render('vr');
-                } else {
-                    D.schedVC.classList.remove('hidden');
-                    render('vc');
-                }
-                
-                s.mode = 'schedule';
-            }
+        D.navSchedule.addEventListener('click', () => {
+            activateNavItem(D.navSchedule);
+            showSchedule();
         });
         
-        D.tabJourney.addEventListener('click', () => {
-            if (s.mode !== 'journey') {
-                resetAllTabs();
-                D.tabJourney.classList.add('active');
-                D.journeyView.classList.remove('hidden');
-                s.mode = 'journey';
-                
-                // Set default journey date to today
-                const today = new Date().toISOString().split('T')[0];
-                D.journeyDate.value = today;
-            }
+        D.navJourney.addEventListener('click', () => {
+            activateNavItem(D.navJourney);
+            showJourney();
         });
         
-        D.tabRuntime.addEventListener('click', () => {
-            if (s.mode !== 'runtime') {
-                resetAllTabs();
-                D.tabRuntime.classList.add('active');
-                D.runtimeView.classList.remove('hidden');
-                s.mode = 'runtime';
-                
-                // Update the runtime input fields with current values
-                updateRuntimeInputs();
-            }
+        D.navSettings.addEventListener('click', () => {
+            D.settingsOverlay.style.display = 'flex';
         });
         
-        function resetAllTabs() {
+        function activateNavItem(navItem) {
+            // Remove active class from all nav items
+            D.navNext.classList.remove('active');
+            D.navSchedule.classList.remove('active');
+            D.navJourney.classList.remove('active');
+            D.navSettings.classList.remove('active');
+            
+            // Add active class to the clicked nav item
+            navItem.classList.add('active');
+        }
+        
+        function showNextBuses() {
+            s.mode = 'current';
+            resetAllViews();
+            
+            if (s.estate === 'vr') {
+                D.curVR.classList.remove('hidden');
+            } else {
+                D.curVC.classList.remove('hidden');
+            }
+            
+            updateBuses();
+        }
+        
+        function showSchedule() {
+            s.mode = 'schedule';
+            resetAllViews();
+            
+            if (s.estate === 'vr') {
+                D.schedVR.classList.remove('hidden');
+                render('vr');
+            } else {
+                D.schedVC.classList.remove('hidden');
+                render('vc');
+            }
+        }
+        
+        function showJourney() {
+            s.mode = 'journey';
+            resetAllViews();
+            D.journeyView.classList.remove('hidden');
+        }
+        
+        function resetAllViews() {
             // Hide all views
             D.curVR.classList.add('hidden');
             D.schedVR.classList.add('hidden');
             D.curVC.classList.add('hidden');
             D.schedVC.classList.add('hidden');
             D.journeyView.classList.add('hidden');
-            D.runtimeView.classList.add('hidden');
-            
-            // Remove active class from all tabs
-            D.tabCur.classList.remove('active');
-            D.tabSched.classList.remove('active');
-            D.tabJourney.classList.remove('active');
-            D.tabRuntime.classList.remove('active');
         }
+        
+        // Settings Panel Event Listeners
+//        D.settingsBtn.addEventListener('click', () => {
+//            D.settingsOverlay.style.display = 'flex';
+//        });
+        
+        D.closeSettings.addEventListener('click', () => {
+            D.settingsOverlay.style.display = 'none';
+        });
+        
+        // Close settings when clicking outside the panel
+        D.settingsOverlay.addEventListener('click', (e) => {
+            if (e.target === D.settingsOverlay) {
+                D.settingsOverlay.style.display = 'none';
+            }
+        });
         
         D.vrTog.addEventListener('click', () => {
             if (s.estate !== 'vr') {
@@ -2705,11 +2889,15 @@
             const s = Math.floor((mins - total) * 60);
             
             if (total < 60) {
-                return `${total} min ${s} sec`;
+                return s.lang === 'zh' ? 
+                    `${total}分鐘${s}秒` : 
+                    `${total} min ${s} sec`;
             } else {
                 const h = Math.floor(total / 60);
                 const m = total % 60;
-                return `${h} hr ${m} min ${s} sec`;
+                return s.lang === 'zh' ? 
+                    `${h}小時${m}分鐘${s}秒` : 
+                    `${h} hr ${m} min ${s} sec`;
             }
         }
         
@@ -3010,10 +3198,13 @@
                 
                 // Adjust journey time for special services
                 if (bus.special) {
-                    if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc')) || 
-                        ((origin === 'vr' || origin === 'vc') && destination === 'ntp')) {
-                        // Special services between NTP and estates go via SC
-                        actualJourneyTime = runtimes.special['ntp-sc'] + runtimes.special['sc-est'];
+                    if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc'))) {
+                        // Special services from NTP to estates go via SC
+                        actualJourneyTime = runtimes.special['ntp-sc'] + (destination === 'vr' ? runtimes.special['sc-vr'] : runtimes.special['sc-vc']);
+                        via = 'sc'; // Override via information for special services
+                    } else if (((origin === 'vr' || origin === 'vc') && destination === 'ntp')) {
+                        // Special services from estates to NTP go via SC
+                        actualJourneyTime = (origin === 'vr' ? runtimes.special['vr-sc'] : runtimes.special['vc-sc']) + runtimes.special['sc-ntp'];
                         via = 'sc'; // Override via information for special services
                     }
                 }
@@ -3037,8 +3228,10 @@
                         let viaJourneyTime;
                         if (via === 'sc' && origin === 'ntp') {
                             viaJourneyTime = runtimes.special['ntp-sc'];
-                        } else if (via === 'sc' && (origin === 'vr' || origin === 'vc')) {
-                            viaJourneyTime = runtimes.special['est-sc'];
+                        } else if (via === 'sc' && origin === 'vr') {
+                            viaJourneyTime = runtimes.special['vr-sc'];
+                        } else if (via === 'sc' && origin === 'vc') {
+                            viaJourneyTime = runtimes.special['vc-sc'];
                         } else if (via === 'vr' && origin === 'ntp') {
                             viaJourneyTime = runtimes.regular['ntp-vr'];
                         } else if (via === 'vr' && origin === 'vc') {
@@ -3174,10 +3367,13 @@
                     
                     // Adjust journey time for special services
                     if (bus.special) {
-                        if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc')) || 
-                            ((origin === 'vr' || origin === 'vc') && destination === 'ntp')) {
-                            // Special services between NTP and estates go via SC
-                            actualJourneyTime = runtimes.special['ntp-sc'] + runtimes.special['sc-est'];
+                        if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc'))) {
+                            // Special services from NTP to estates go via SC
+                            actualJourneyTime = runtimes.special['ntp-sc'] + (destination === 'vr' ? runtimes.special['sc-vr'] : runtimes.special['sc-vc']);
+                            via = 'sc'; // Override via information for special services
+                        } else if (((origin === 'vr' || origin === 'vc') && destination === 'ntp')) {
+                            // Special services from estates to NTP go via SC
+                            actualJourneyTime = (origin === 'vr' ? runtimes.special['vr-sc'] : runtimes.special['vc-sc']) + runtimes.special['sc-ntp'];
                             via = 'sc'; // Override via information for special services
                         }
                     }
@@ -3193,8 +3389,10 @@
                         let viaJourneyTime;
                         if (via === 'sc' && origin === 'ntp') {
                             viaJourneyTime = runtimes.special['ntp-sc'];
-                        } else if (via === 'sc' && (origin === 'vr' || origin === 'vc')) {
-                            viaJourneyTime = runtimes.special['est-sc'];
+                        } else if (via === 'sc' && origin === 'vr') {
+                            viaJourneyTime = runtimes.special['vr-sc'];
+                        } else if (via === 'sc' && origin === 'vc') {
+                            viaJourneyTime = runtimes.special['vc-sc'];
                         } else if (via === 'vr' && origin === 'ntp') {
                             viaJourneyTime = runtimes.regular['ntp-vr'];
                         } else if (via === 'vr' && origin === 'vc') {
@@ -3448,15 +3646,15 @@
             // Regular service runtimes
             D.rtRegNTPVR.value = runtimes.regular['ntp-vr'];
             D.rtRegVRNTP.value = runtimes.regular['vr-ntp'];
-            D.rtRegSCVR.value = runtimes.regular['sc-vr'];
             D.rtRegSCVC.value = runtimes.regular['sc-vc'];
-            D.rtRegVRSC.value = runtimes.regular['vr-sc'];
             D.rtRegVCSC.value = runtimes.regular['vc-sc'];
             
             // Special service runtimes
             D.rtSpecNTPSC.value = runtimes.special['ntp-sc'];
-            D.rtSpecSCEst.value = runtimes.special['sc-est'];
-            D.rtSpecEstSC.value = runtimes.special['est-sc'];
+            D.rtSpecSCVR.value = runtimes.special['sc-vr'];
+            D.rtSpecSCVC.value = runtimes.special['sc-vc'];
+            D.rtSpecVRSC.value = runtimes.special['vr-sc'];
+            D.rtSpecVCSC.value = runtimes.special['vc-sc'];
             D.rtSpecSCNTP.value = runtimes.special['sc-ntp'];
             
             // Inter-estate runtimes
@@ -3468,15 +3666,19 @@
             // Update regular service runtimes
             runtimes.regular['ntp-vr'] = parseInt(D.rtRegNTPVR.value);
             runtimes.regular['vr-ntp'] = parseInt(D.rtRegVRNTP.value);
-            runtimes.regular['sc-vr'] = parseInt(D.rtRegSCVR.value);
             runtimes.regular['sc-vc'] = parseInt(D.rtRegSCVC.value);
-            runtimes.regular['vr-sc'] = parseInt(D.rtRegVRSC.value);
             runtimes.regular['vc-sc'] = parseInt(D.rtRegVCSC.value);
+            
+            // Calculate derived values for SC-VR and VR-SC based on SC-VC
+            runtimes.regular['sc-vr'] = parseInt(D.rtRegSCVC.value) + parseInt(D.rtInterVCVR.value);
+            runtimes.regular['vr-sc'] = parseInt(D.rtRegVCSC.value) + parseInt(D.rtInterVRVC.value);
             
             // Update special service runtimes
             runtimes.special['ntp-sc'] = parseInt(D.rtSpecNTPSC.value);
-            runtimes.special['sc-est'] = parseInt(D.rtSpecSCEst.value);
-            runtimes.special['est-sc'] = parseInt(D.rtSpecEstSC.value);
+            runtimes.special['sc-vr'] = parseInt(D.rtSpecSCVR.value);
+            runtimes.special['sc-vc'] = parseInt(D.rtSpecSCVC.value);
+            runtimes.special['vr-sc'] = parseInt(D.rtSpecVRSC.value);
+            runtimes.special['vc-sc'] = parseInt(D.rtSpecVCSC.value);
             runtimes.special['sc-ntp'] = parseInt(D.rtSpecSCNTP.value);
             
             // Update inter-estate runtimes
@@ -3591,7 +3793,8 @@
             D.runtimeSave.addEventListener('click', saveRuntimeValues);
             D.runtimeReset.addEventListener('click', resetRuntimeValues);
             
-            D.tabCur.click();
+            // Show default view
+            showNextBuses();
             window.addEventListener('beforeunload', savePrefs);
         }
         
