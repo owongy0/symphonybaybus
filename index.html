@@ -513,7 +513,7 @@
         }
         
         @keyframes pulse {
-            from { opacity: A1; }
+            from { opacity: 1; }
             to { opacity: 0.6; }
         }
         
@@ -1048,6 +1048,7 @@
                             <option value="vr-ntp" data-en="Villa Rhapsody to New Town Plaza (Main)" data-zh="由凱琴居往新城市廣場 (主線)">Villa Rhapsody to New Town Plaza (Main)</option>
                             <option value="sc-vr" data-en="Sunshine City to Villa Rhapsody (Short)" data-zh="由新港城往凱琴居 (短途線)">Sunshine City to Villa Rhapsody (Short)</option>
                             <option value="vr-sc" data-en="Villa Rhapsody to Sunshine City (Short)" data-zh="由凱琴居往新港城 (短途線)">Villa Rhapsody to Sunshine City (Short)</option>
+                            <option value="vr-vc" data-en="Villa Rhapsody to Villa Concerto (Direct)" data-zh="由凱琴居往凱弦居 (直達)">Villa Rhapsody to Villa Concerto (Direct)</option>
                         </select>
                         <select id="day-sel-vr">
                             <option value="weekday" data-en="Monday to Friday" data-zh="星期一至星期五">Monday to Friday</option>
@@ -1156,6 +1157,7 @@
                             <option value="vc-ntp" data-en="Villa Concerto to New Town Plaza (Main)" data-zh="由凱弦居往新城市廣場 (主線)">Villa Concerto to New Town Plaza (Main)</option>
                             <option value="sc-vc" data-en="Sunshine City to Villa Concerto (Short)" data-zh="由新港城往凱弦居 (短途線)">Sunshine City to Villa Concerto (Short)</option>
                             <option value="vc-sc" data-en="Villa Concerto to Sunshine City (Short)" data-zh="由凱弦居往新港城 (短途線)">Villa Concerto to Sunshine City (Short)</option>
+                            <option value="vc-vr" data-en="Villa Concerto to Villa Rhapsody (Direct)" data-zh="由凱弦居往凱琴居 (直達)">Villa Concerto to Villa Rhapsody (Direct)</option>
                         </select>
                         <select id="day-sel-vc">
                             <option value="weekday" data-en="Monday to Friday" data-zh="星期一至星期五">Monday to Friday</option>
@@ -1425,14 +1427,16 @@
                 'ntp-vr': false, // NTP to VR doesn't stop at VC
                 'vr-ntp': false, // VR to NTP doesn't stop at VC
                 'sc-vr': true,   // SC to VR does stop at VC
-                'vr-sc': true    // VR to SC stops at VC
+                'vr-sc': true,   // VR to SC stops at VC
+                'vr-vc': false   // VR to VC is direct
             },
             // At Villa Concerto
             'vc': {
                 'ntp-vc': true,  // NTP to VC stops at VR
                 'vc-ntp': true,  // VC to NTP stops at VR
                 'sc-vc': false,  // SC to VC doesn't stop at VR
-                'vc-sc': false   // VC to SC doesn't stop at VR
+                'vc-sc': false,  // VC to SC doesn't stop at VR
+                'vc-vr': false   // VC to VR is direct
             }
         };
 
@@ -1481,6 +1485,7 @@
         // Create a mutable runtime configuration that can be updated by the user
         let runtimes = JSON.parse(JSON.stringify(defaultRuntimes));
 
+        // Schedule data for Villa Rhapsody routes
         const schVR = {
             "ntp-vr": {
                 "weekday": [
@@ -1933,9 +1938,71 @@
                     {time: "22:10", special: true},
                     {time: "22:40", special: true}
                 ]
+            },
+            // Direct VR to VC schedule
+            "vr-vc": {
+                "weekday": [
+                    {time: "07:05", special: false},
+                    {time: "07:35", special: false},
+                    {time: "08:05", special: false},
+                    {time: "08:35", special: false},
+                    {time: "09:05", special: false},
+                    {time: "09:35", special: false},
+                    {time: "10:05", special: false},
+                    {time: "10:35", special: false},
+                    {time: "11:05", special: false},
+                    {time: "11:35", special: false},
+                    {time: "12:05", special: false},
+                    {time: "12:35", special: false},
+                    {time: "13:05", special: false},
+                    {time: "13:35", special: false},
+                    {time: "14:05", special: false},
+                    {time: "14:35", special: false},
+                    {time: "15:05", special: false},
+                    {time: "15:35", special: false},
+                    {time: "16:05", special: false},
+                    {time: "16:35", special: false},
+                    {time: "17:05", special: false},
+                    {time: "17:35", special: false},
+                    {time: "18:05", special: false},
+                    {time: "18:35", special: false},
+                    {time: "19:05", special: false},
+                    {time: "19:35", special: false},
+                    {time: "20:05", special: false}
+                ],
+                "weekend": [
+                    {time: "07:05", special: false},
+                    {time: "07:35", special: false},
+                    {time: "08:05", special: false},
+                    {time: "08:35", special: false},
+                    {time: "09:05", special: false},
+                    {time: "09:35", special: false},
+                    {time: "10:05", special: false},
+                    {time: "10:35", special: false},
+                    {time: "11:05", special: false},
+                    {time: "11:35", special: false},
+                    {time: "12:05", special: false},
+                    {time: "12:35", special: false},
+                    {time: "13:05", special: false},
+                    {time: "13:35", special: false},
+                    {time: "14:05", special: false},
+                    {time: "14:35", special: false},
+                    {time: "15:05", special: false},
+                    {time: "15:35", special: false},
+                    {time: "16:05", special: false},
+                    {time: "16:35", special: false},
+                    {time: "17:05", special: false},
+                    {time: "17:35", special: false},
+                    {time: "18:05", special: false},
+                    {time: "18:35", special: false},
+                    {time: "19:05", special: false},
+                    {time: "19:35", special: false},
+                    {time: "20:05", special: false}
+                ]
             }
         };
         
+        // Schedule data for Villa Concerto routes
         const schVC = {
             "ntp-vc": {
                 "weekday": [
@@ -2388,6 +2455,67 @@
                     {time: "22:10", special: true},
                     {time: "22:40", special: true}
                 ]
+            },
+            // Direct VC to VR schedule
+            "vc-vr": {
+                "weekday": [
+                    {time: "07:05", special: false},
+                    {time: "07:35", special: false},
+                    {time: "08:05", special: false},
+                    {time: "08:35", special: false},
+                    {time: "09:05", special: false},
+                    {time: "09:35", special: false},
+                    {time: "10:05", special: false},
+                    {time: "10:35", special: false},
+                    {time: "11:05", special: false},
+                    {time: "11:35", special: false},
+                    {time: "12:05", special: false},
+                    {time: "12:35", special: false},
+                    {time: "13:05", special: false},
+                    {time: "13:35", special: false},
+                    {time: "14:05", special: false},
+                    {time: "14:35", special: false},
+                    {time: "15:05", special: false},
+                    {time: "15:35", special: false},
+                    {time: "16:05", special: false},
+                    {time: "16:35", special: false},
+                    {time: "17:05", special: false},
+                    {time: "17:35", special: false},
+                    {time: "18:05", special: false},
+                    {time: "18:35", special: false},
+                    {time: "19:05", special: false},
+                    {time: "19:35", special: false},
+                    {time: "20:05", special: false}
+                ],
+                "weekend": [
+                    {time: "07:05", special: false},
+                    {time: "07:35", special: false},
+                    {time: "08:05", special: false},
+                    {time: "08:35", special: false},
+                    {time: "09:05", special: false},
+                    {time: "09:35", special: false},
+                    {time: "10:05", special: false},
+                    {time: "10:35", special: false},
+                    {time: "11:05", special: false},
+                    {time: "11:35", special: false},
+                    {time: "12:05", special: false},
+                    {time: "12:35", special: false},
+                    {time: "13:05", special: false},
+                    {time: "13:35", special: false},
+                    {time: "14:05", special: false},
+                    {time: "14:35", special: false},
+                    {time: "15:05", special: false},
+                    {time: "15:35", special: false},
+                    {time: "16:05", special: false},
+                    {time: "16:35", special: false},
+                    {time: "17:05", special: false},
+                    {time: "17:35", special: false},
+                    {time: "18:05", special: false},
+                    {time: "18:35", special: false},
+                    {time: "19:05", special: false},
+                    {time: "19:35", special: false},
+                    {time: "20:05", special: false}
+                ]
             }
         };
 
@@ -2554,7 +2682,7 @@
             D.journeyView.classList.add('hidden');
         }
         
-// Settings Panel Event Listeners
+        // Settings Panel Event Listeners
         D.closeSettings.addEventListener('click', () => {
             D.settingsOverlay.style.display = 'none';
         });
@@ -2780,6 +2908,20 @@
             const dt = isWeekday() ? "weekday" : "weekend";
             
             const sch = estate === 'vr' ? schVR : schVC;
+            
+            // Check if the key exists in the schedule for the current estate
+            if (!sch[key]) {
+                return {
+                    next: { time: "--:--", special: false },
+                    prev: { time: "--:--", special: false },
+                    until: 0,
+                    prog: 0,
+                    tmrw: false,
+                    stopsAt: false,
+                    viaLocation: null
+                };
+            }
+            
             const schedule = sch[key][dt];
             
             const h = now.getHours();
@@ -2995,6 +3137,13 @@
             
             const key = dom.routeSel.value;
             const dayType = dom.daySel.value;
+            
+            // Ensure the selected route exists in the schedule
+            if (!sch[key] || !sch[key][dayType]) {
+                dom.grid.innerHTML = '<div>No schedule data available for this route.</div>';
+                return;
+            }
+            
             const schedule = sch[key][dayType];
             
             dom.title.textContent = dom.routeSel.options[dom.routeSel.selectedIndex].textContent;
@@ -3141,17 +3290,17 @@
                 via = null;
             }
             else if (origin === 'vr' && destination === 'vc') {
-                // For VR to VC, use VR-SC bus and get off at VC
+                // Direct VR to VC route
                 estateKey = 'vr';
-                routeKey = 'vr-sc';
+                routeKey = 'vr-vc';
                 schedule = schVR[routeKey][dayType];
                 journeyTime = runtimes.interEstate['vr-vc'];
                 via = null;
             }
             else if (origin === 'vc' && destination === 'vr') {
-                // For VC to VR, use VC-SC bus and get off at VR
+                // Direct VC to VR route
                 estateKey = 'vc';
-                routeKey = 'vc-sc';
+                routeKey = 'vc-vr';
                 schedule = schVC[routeKey][dayType];
                 journeyTime = runtimes.interEstate['vc-vr'];
                 via = null;
@@ -3333,17 +3482,17 @@
                 via = null;
             }
             else if (origin === 'vr' && destination === 'vc') {
-                // For VR to VC, use VR-SC bus and get off at VC
+                // Direct VR to VC route
                 estateKey = 'vr';
-                routeKey = 'vr-sc';
+                routeKey = 'vr-vc';
                 schedule = schVR[routeKey][dayType];
                 journeyTime = runtimes.interEstate['vr-vc'];
                 via = null;
             }
             else if (origin === 'vc' && destination === 'vr') {
-                // For VC to VR, use VC-SC bus and get off at VR
+                // Direct VC to VR route
                 estateKey = 'vc';
-                routeKey = 'vc-sc';
+                routeKey = 'vc-vr';
                 schedule = schVC[routeKey][dayType];
                 journeyTime = runtimes.interEstate['vc-vr'];
                 via = null;
