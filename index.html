@@ -227,29 +227,6 @@
             margin-top: 3px;
         }
         
-        .settings-btn {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            background: none;
-            border: none;
-            color: var(--icon-color);
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 100;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background-color 0.3s;
-        }
-        
-        .settings-btn:hover {
-            background-color: var(--tog-bg);
-        }
-        
         .settings-overlay {
             position: fixed;
             top: 0;
@@ -536,7 +513,7 @@
         }
         
         @keyframes pulse {
-            from { opacity: 1; }
+            from { opacity: A1; }
             to { opacity: 0.6; }
         }
         
@@ -1412,7 +1389,6 @@
             holidayName: document.getElementById('holiday-name'),
             
             // Settings
-            settingsBtn: document.getElementById('nav-settings'),
             settingsOverlay: document.getElementById('settings-overlay'),
             closeSettings: document.getElementById('close-settings'),
             
@@ -2578,11 +2554,7 @@
             D.journeyView.classList.add('hidden');
         }
         
-        // Settings Panel Event Listeners
-//        D.settingsBtn.addEventListener('click', () => {
-//            D.settingsOverlay.style.display = 'flex';
-//        });
-        
+// Settings Panel Event Listeners
         D.closeSettings.addEventListener('click', () => {
             D.settingsOverlay.style.display = 'none';
         });
@@ -3184,6 +3156,28 @@
                 journeyTime = runtimes.interEstate['vc-vr'];
                 via = null;
             }
+            else if (origin === 'ntp' && destination === 'sc') {
+                // For NTP to SC, check special runs only as regular services don't go this way
+                estateKey = 'vr';
+                routeKey = 'ntp-vr';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.special['ntp-sc'];
+                via = null;
+                
+                // Filter to include only special runs
+                schedule = schedule.filter(bus => bus.special);
+            }
+            else if (origin === 'sc' && destination === 'ntp') {
+                // For SC to NTP, check special runs only as regular services don't go this way
+                estateKey = 'vr';
+                routeKey = 'vr-ntp';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.special['sc-ntp'];
+                via = null;
+                
+                // Filter to include only special runs
+                schedule = schedule.filter(bus => bus.special);
+            }
             
             if (!schedule) {
                 return results;
@@ -3198,11 +3192,20 @@
                 
                 // Adjust journey time for special services
                 if (bus.special) {
-                    if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc'))) {
+                    if (origin === 'ntp' && destination === 'sc') {
+                        // Direct calculation for special NTP to SC
+                        actualJourneyTime = runtimes.special['ntp-sc'];
+                    }
+                    else if (origin === 'sc' && destination === 'ntp') {
+                        // Direct calculation for special SC to NTP
+                        actualJourneyTime = runtimes.special['sc-ntp'];
+                    }
+                    else if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc'))) {
                         // Special services from NTP to estates go via SC
                         actualJourneyTime = runtimes.special['ntp-sc'] + (destination === 'vr' ? runtimes.special['sc-vr'] : runtimes.special['sc-vc']);
                         via = 'sc'; // Override via information for special services
-                    } else if (((origin === 'vr' || origin === 'vc') && destination === 'ntp')) {
+                    } 
+                    else if (((origin === 'vr' || origin === 'vc') && destination === 'ntp')) {
                         // Special services from estates to NTP go via SC
                         actualJourneyTime = (origin === 'vr' ? runtimes.special['vr-sc'] : runtimes.special['vc-sc']) + runtimes.special['sc-ntp'];
                         via = 'sc'; // Override via information for special services
@@ -3345,6 +3348,28 @@
                 journeyTime = runtimes.interEstate['vc-vr'];
                 via = null;
             }
+            else if (origin === 'ntp' && destination === 'sc') {
+                // For NTP to SC, check special runs only as regular services don't go this way
+                estateKey = 'vr';
+                routeKey = 'ntp-vr';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.special['ntp-sc'];
+                via = null;
+                
+                // Filter to include only special runs
+                schedule = schedule.filter(bus => bus.special);
+            }
+            else if (origin === 'sc' && destination === 'ntp') {
+                // For SC to NTP, check special runs only as regular services don't go this way
+                estateKey = 'vr';
+                routeKey = 'vr-ntp';
+                schedule = schVR[routeKey][dayType];
+                journeyTime = runtimes.special['sc-ntp'];
+                via = null;
+                
+                // Filter to include only special runs
+                schedule = schedule.filter(bus => bus.special);
+            }
             
             if (!schedule) {
                 return results;
@@ -3367,7 +3392,15 @@
                     
                     // Adjust journey time for special services
                     if (bus.special) {
-                        if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc'))) {
+                        if (origin === 'ntp' && destination === 'sc') {
+                            // Direct calculation for special NTP to SC
+                            actualJourneyTime = runtimes.special['ntp-sc'];
+                        }
+                        else if (origin === 'sc' && destination === 'ntp') {
+                            // Direct calculation for special SC to NTP
+                            actualJourneyTime = runtimes.special['sc-ntp'];
+                        }
+                        else if ((origin === 'ntp' && (destination === 'vr' || destination === 'vc'))) {
                             // Special services from NTP to estates go via SC
                             actualJourneyTime = runtimes.special['ntp-sc'] + (destination === 'vr' ? runtimes.special['sc-vr'] : runtimes.special['sc-vc']);
                             via = 'sc'; // Override via information for special services
@@ -3617,9 +3650,20 @@
             
             const noResults = document.createElement('div');
             noResults.className = 'journey-card';
-            noResults.textContent = s.lang === 'en' ? 
-                'No suitable buses found for this journey. Try a different time or date.' : 
-                '找不到合適的巴士。請嘗試不同的時間或日期。';
+            
+            // Check if this is an NTP-SC or SC-NTP route which only works with special runs
+            const origin = D.originSel.value;
+            const destination = D.destSel.value;
+            
+            if ((origin === 'ntp' && destination === 'sc') || (origin === 'sc' && destination === 'ntp')) {
+                noResults.textContent = s.lang === 'en' ? 
+                    'No suitable buses found. This route is only served by special runs in the evening. Please try a later time.' : 
+                    '找不到合適的巴士。此路線只由傍晚的特別班次提供服務。請嘗試稍後時間。';
+            } else {
+                noResults.textContent = s.lang === 'en' ? 
+                    'No suitable buses found for this journey. Try a different time or date.' : 
+                    '找不到合適的巴士。請嘗試不同的時間或日期。';
+            }
             
             resultsDiv.appendChild(noResults);
         }
@@ -3792,6 +3836,9 @@
             // Setup runtime editor event listeners
             D.runtimeSave.addEventListener('click', saveRuntimeValues);
             D.runtimeReset.addEventListener('click', resetRuntimeValues);
+            
+            // Initially populate runtime inputs
+            updateRuntimeInputs();
             
             // Show default view
             showNextBuses();
