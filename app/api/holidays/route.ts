@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 
+// Force static generation for static export
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 const HOLIDAY_ICS_URL = 'https://www.1823.gov.hk/common/ical/en.ics';
 
 interface Holiday {
